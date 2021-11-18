@@ -31,7 +31,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         body: ${{ steps.tag_version.outputs.changelog }}
-        tag: Scabiosa ${{ steps.tag_version.outputs.new_tag }}
+        tag_name: Scabiosa ${{ steps.tag_version.outputs.new_tag }}
         draft: false
         prerelease: false
         files: scabiosa
