@@ -1,14 +1,18 @@
 package StorageTypes
 
-import "fmt"
-
 type Storage interface {
-	upload() error
+	upload(fileName string)
 }
 
-func UploadFile(storage Storage){
-	err := storage.upload()
-	if err != nil{
-		fmt.Print(err)
+func UploadFile(storage Storage, fileName string){
+	storage.upload(fileName)
+}
+
+func CheckStorageType(storageType string) Storage{
+
+	if storageType == "azure-fileshare"{
+		return GetAzureStorage()
 	}
+
+	return nil
 }
