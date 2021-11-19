@@ -1,6 +1,6 @@
 {
-  "azcopyPath": "",
-  "storageAccUrl": "",
-  "targetDirectory": "",
-  "SASKey": ""
+  "storageAccountName": "",
+  "storageAccountKey": "",
+  "fileshareName": "",
+  "targetDirectory": ""
 }
