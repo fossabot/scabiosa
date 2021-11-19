@@ -7,11 +7,27 @@ import (
 )
 
 type Config struct {
-	_7zPath string
-	_7zArgs string
+	LocalBackupPath string `json:"localBackupPath"`
+	SQLConfig struct{
+		SqlType string `json:"sqlType"`
+		SqlAddress string `json:"sql-address"`
+		SqlPort uint16 `json:"sql-port"`
+		Database string `json:"database"`
+		DbUser string `json:"db-user"`
+		DbPassword string `json:"db-password"`
+	} `json:"sqlConfig"`
+	FolderToBackup []struct{
+		BackupName string `json:"backupName"`
+		FolderPath string `json:"folderPath"`
+		StorageType string `json:"storageType"`
+		CreateLocalBackup bool `json:"createLocalBackup"`
+	} `json:"foldersToBackup"`
+}
+type Backup struct{
+	backupName string
+	folderPath string
 	storageType string
-	localbackup uint8
-	localbackupPath string
+	createLocalBackup bool
 }
 
 func readConfig() []byte {
@@ -21,9 +37,9 @@ func readConfig() []byte {
 	if err != nil {
 		logger.Fatal(err)
 	}
-
 	return file
 }
+
 
 func GetConfig() Config {
 	logger := Logging.DetailedLogger("ConfigHandler", "GetConfig()")
