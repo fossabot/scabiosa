@@ -1,7 +1,19 @@
 {
-  "_7zPath": "",
-  "_7zArgs": "",
-  "storageType": "azure",
-  "localbackup": 0,
-  "localbackupPath": ""
+  "localBackupPath": "",
+  "sqlConfig": {
+    "sqlType": "",
+    "sql-address": "",
+    "sql-port": 0,
+    "database": "",
+    "db-user": "",
+    "db-password": ""
+  },
+  "foldersToBackup": [
+    {
+      "backupName": "",
+      "folderPath": "",
+      "storageType": "",
+      "createLocalBackup": false
+    }
+  ]
 }

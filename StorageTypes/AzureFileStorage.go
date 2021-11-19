@@ -1,23 +1,63 @@
 package StorageTypes
 
 import (
+	"context"
 	"encoding/json"
-	"errors"
+	"fmt"
+	"github.com/Azure/azure-storage-file-go/azfile"
+	"net/url"
 	"os"
+	"path/filepath"
 	"scabiosa/Logging"
+	"strings"
 )
 
 type AzureFileStorage struct{
-	azcopyPath string
-	storageAccUrl string
-	targetDirectory string
-	SASKey string
+	FileshareName string `json:"fileshareName"`
+	TargetDirectory string `json:"targetDirectory"`
+	StorageAccountName string `json:"storageAccountName"`
+	StorageAccountKey string `json:"storageAccountKey"`
 }
 
 
-func (azure AzureFileStorage) upload() error{
-	//Do Stuff here
-	return errors.New("lelek")
+func (azure AzureFileStorage) upload(fileName string){
+	logger := Logging.DetailedLogger("AzureFileStorage", "upload")
+
+	file, err := os.Open(fileName)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	defer file.Close()
+
+	fileSize, err := file.Stat()
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	credential, err := azfile.NewSharedKeyCredential(azure.StorageAccountName, azure.StorageAccountKey)
+	if err != nil{
+		logger.Fatal(err)
+	}
+
+	u, _ := url.Parse(fmt.Sprintf("https://%s.file.core.windows.net/%s/%s/%s", azure.StorageAccountName, azure.FileshareName ,azure.TargetDirectory, filepath.Base(fileName)))
+
+	fileURL := azfile.NewFileURL(*u, azfile.NewPipeline(credential, azfile.PipelineOptions{}))
+
+	ctx := context.Background()
+
+	fmt.Printf("[%s] Starting upload to Azure File Share...\n", strings.Trim(filepath.Base(fileName), ".bak"))
+
+	err = azfile.UploadFileToAzureFile(ctx, file, fileURL,
+		azfile.UploadToAzureFileOptions{
+		Parallelism: 3,
+		FileHTTPHeaders: azfile.FileHTTPHeaders{
+			CacheControl: "no-transform",
+		},
+		Progress: func(bytesTransferred int64){
+			fmt.Printf("[%s] Uploaded %d of %d bytes.\n", strings.Trim(filepath.Base(fileName), ".bak") ,bytesTransferred, fileSize.Size())
+		}})
+
+	fmt.Printf("[%s] Upload finished.\n", strings.Trim(filepath.Base(fileName), ".bak"))
 }
 
 func readConfig() []byte {
