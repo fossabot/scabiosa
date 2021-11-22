@@ -4,7 +4,11 @@ go 1.17
 
 require github.com/sirupsen/logrus v1.8.1
 
-require github.com/Azure/azure-storage-file-go v0.8.0
+require (
+	github.com/Azure/azure-storage-file-go v0.8.0
+	github.com/go-sql-driver/mysql v1.6.0
+	github.com/google/uuid v1.3.0
+)
 
 require (
 	github.com/Azure/azure-pipeline-go v0.2.1 // indirect
