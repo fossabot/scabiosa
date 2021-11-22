@@ -5,11 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Azure/azure-storage-file-go/azfile"
+	"github.com/google/uuid"
 	"net/url"
 	"os"
 	"path/filepath"
 	"scabiosa/Logging"
+	"scabiosa/SQL"
 	"strings"
+	"time"
 )
 
 type AzureFileStorage struct{
@@ -46,6 +49,8 @@ func (azure AzureFileStorage) upload(fileName string){
 	ctx := context.Background()
 
 	fmt.Printf("[%s] Starting upload to Azure File Share...\n", strings.Trim(filepath.Base(fileName), ".bak"))
+	//TODO Remove Hardcoded SQL Instance
+	SQL.NewLogEntry(SQL.GetMariaDBInstance(), uuid.New(), SQL.LogInfo, filepath.Base(fileName), SQL.SQLStage_Upload, SQL.REMOTE_AZURE_FILE, "Starting upload.", time.Now())
 
 	err = azfile.UploadFileToAzureFile(ctx, file, fileURL,
 		azfile.UploadToAzureFileOptions{
@@ -58,6 +63,8 @@ func (azure AzureFileStorage) upload(fileName string){
 		}})
 
 	fmt.Printf("[%s] Upload finished.\n", strings.Trim(filepath.Base(fileName), ".bak"))
+	//TODO Remove Hardcoded SQL Instance
+	SQL.NewLogEntry(SQL.GetMariaDBInstance(), uuid.New(), SQL.LogInfo, filepath.Base(fileName), SQL.SQLStage_Upload, SQL.REMOTE_AZURE_FILE, "Finished upload.", time.Now())
 }
 
 func readConfig() []byte {
