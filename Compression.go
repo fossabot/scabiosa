@@ -6,10 +6,13 @@ import (
 	"compress/flate"
 	"compress/gzip"
 	"fmt"
+	"github.com/google/uuid"
 	"io"
 	"os"
 	"path/filepath"
 	"scabiosa/Logging"
+	"scabiosa/SQL"
+	"time"
 )
 
 func CreateBakFile(filename string, folderPath string, destinationPath string) string {
@@ -29,6 +32,10 @@ func CreateBakFile(filename string, folderPath string, destinationPath string) s
 		logger.Fatal(err)
 	}
 
+	//TODO Remove Hardcoded SQL Instance
+	SQL.NewLogEntry(SQL.GetMariaDBInstance(), uuid.New(), SQL.LogInfo, filepath.Base(folderPath), SQL.SQLStage_Compress, SQL.REMOTE_NONE, "File successfully written.", time.Now())
+
+
 	return fileName
 }
 
@@ -40,7 +47,8 @@ func compress(folderPath string, buf io.Writer){
 	tw := tar.NewWriter(zr)
 
 	fmt.Printf("[%s] Start compression...\n", filepath.Base(folderPath))
-
+	//TODO Remove Hardcoded SQL Instance
+	SQL.NewLogEntry(SQL.GetMariaDBInstance(), uuid.New(), SQL.LogInfo, filepath.Base(folderPath), SQL.SQLStage_Compress, SQL.REMOTE_NONE, "Start compression", time.Now())
 	filepath.Walk(folderPath, func(file string, fi os.FileInfo, err error) error {
 		header, err := tar.FileInfoHeader(fi, file)
 		if err != nil {
@@ -78,4 +86,6 @@ func compress(folderPath string, buf io.Writer){
 
 
 	fmt.Printf("[%s] Compression Done.\n", filepath.Base(folderPath))
+	//TODO Remove Hardcoded SQL Instance
+	SQL.NewLogEntry(SQL.GetMariaDBInstance(), uuid.New(), SQL.LogInfo, filepath.Base(folderPath), SQL.SQLStage_Compress, SQL.REMOTE_NONE, "Compression complete.", time.Now())
 }
