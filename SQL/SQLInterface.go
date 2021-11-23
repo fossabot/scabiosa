@@ -2,6 +2,7 @@ package SQL
 
 import (
 	"github.com/google/uuid"
+	"scabiosa/Tools"
 	"time"
 )
 
@@ -21,4 +22,14 @@ func NewLogEntry(sqlService SQLService, uuid uuid.UUID, logType LogType, backupN
 
 func NewBackupEntry(sqlService SQLService, uuid uuid.UUID, backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string, durationToBackup time.Duration, hadErrors bool){
 	sqlService.newBackupEntry(uuid, backupName, lastBackup, localBackup, filePath, storageType, remotePath, durationToBackup, hadErrors)
+}
+
+func GetSQLInstance() SQLService{
+	config := Tools.GetConfig()
+
+	switch config.SQLConfig.SqlType {
+		case "mariadb": {return GetMariaDBInstance()}
+	}
+
+	return nil
 }
