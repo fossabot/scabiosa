@@ -1,4 +1,4 @@
-package Tools
+package Compressor
 
 import (
 	"archive/tar"
