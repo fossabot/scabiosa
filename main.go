@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/google/uuid"
 	"os"
+	"scabiosa/Compressor"
 	"scabiosa/Logging"
 	"scabiosa/SQL"
 	"scabiosa/StorageTypes"
@@ -13,19 +14,18 @@ import (
 func main(){
 	config := Tools.GetConfig()
 
-	SQL.CreateDefaultTables(SQL.GetMariaDBInstance())
+	SQL.CreateDefaultTables(SQL.GetSQLInstance())
 
 	for _, backupItem := range config.FolderToBackup{
 		storage := StorageTypes.CheckStorageType(backupItem.StorageType)
 		destPath := checkTmpPath(config, backupItem.CreateLocalBackup)
 
-		bakFile := CreateBakFile(backupItem.BackupName + getTimeSuffix(), backupItem.FolderPath, destPath)
+		bakFile := Compressor.CreateBakFile(backupItem.BackupName + getTimeSuffix(), backupItem.FolderPath, destPath)
 		StorageTypes.UploadFile(storage, destPath + string(os.PathSeparator) + bakFile)
 
 		if !backupItem.CreateLocalBackup {
 			_ = os.Remove(destPath + string(os.PathSeparator) + bakFile)
-			//TODO Remove Hardcoded SQL Instance
-			SQL.NewLogEntry(SQL.GetMariaDBInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_DeleteTmp, SQL.REMOTE_NONE, "Deleted tmp file" ,time.Now())
+			SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_DeleteTmp, SQL.REMOTE_NONE, "Deleted tmp file" ,time.Now())
 		}
 
 	}
