@@ -2,7 +2,6 @@ package Compressor
 
 import (
 	"archive/tar"
-	"bytes"
 	"compress/flate"
 	"compress/gzip"
 	"fmt"
@@ -15,74 +14,83 @@ import (
 	"time"
 )
 
-func CreateBakFile(filename string, folderPath string, destinationPath string) string {
+func CreateBakFile(fileName string, folderPath string, destinationPath string) string {
 	logger := Logging.DetailedLogger("Compression", "CreateBakFile")
 
-	var buf bytes.Buffer
-	compress(folderPath, &buf)
+	pathToFile := destinationPath + string(os.PathSeparator) + fileName + ".bak"
 
-	fileName := filename + ".bak"
-
-	fileToWrite, err := os.OpenFile(destinationPath + string(os.PathSeparator) + fileName, os.O_CREATE|os.O_RDWR, os.FileMode(600))
+	fileToWrite, err := os.OpenFile(pathToFile, os.O_CREATE|os.O_RDWR, os.FileMode(600))
 	if err != nil {
 		logger.Fatal(err)
 	}
-
-	if _, err := io.Copy(fileToWrite, &buf); err != nil {
-		logger.Fatal(err)
-	}
+	compress(fileToWrite, folderPath)
 
 	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, filepath.Base(folderPath), SQL.SQLStage_Compress, SQL.REMOTE_NONE, "File successfully written.", time.Now())
-
-
-	return fileName
+	fileToWrite.Close()
+	return pathToFile
 }
 
+func compressFile(targetFile *os.File, file string, fi os.FileInfo, folderPath string) error {
 
-func compress(folderPath string, buf io.Writer){
+	fileWriter, _ := gzip.NewWriterLevel(targetFile, flate.BestCompression)
+	tw := tar.NewWriter(fileWriter)
+
+	header, err := tar.FileInfoHeader(fi, file)
+	if err != nil{
+		return err
+	}
+
+	relPath, _ := filepath.Rel(filepath.Dir(folderPath), file)
+	header.Name = relPath
+
+	if err := tw.WriteHeader(header); err != nil {
+		return err
+	}
+
+	if !fi.IsDir(){
+		data, err := os.Open(file)
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("[%s] Compressing: %s (%d bytes)\n", filepath.Base(folderPath) ,relPath, fi.Size())
+		if _, err := io.Copy(tw, data); err != nil {
+			return err
+		}
+	}
+
+	if err := tw.Close(); err != nil {
+		return err
+	}
+
+	if err := fileWriter.Close(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func compress(targetFile *os.File, folderPath string) {
 	logger := Logging.DetailedLogger("Gzip", "compress")
-
-	zr, _ := gzip.NewWriterLevel(buf, flate.BestCompression)
-	tw := tar.NewWriter(zr)
 
 	fmt.Printf("[%s] Start compression...\n", filepath.Base(folderPath))
 	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, filepath.Base(folderPath), SQL.SQLStage_Compress, SQL.REMOTE_NONE, "Start compression", time.Now())
 	filepath.Walk(folderPath, func(file string, fi os.FileInfo, err error) error {
-		header, err := tar.FileInfoHeader(fi, file)
-		if err != nil {
-			logger.Fatal(err)
-		}
 
-		relPath, _ := filepath.Rel(filepath.Dir(folderPath), file)
-
-		header.Name = relPath
-		if err := tw.WriteHeader(header); err != nil {
-			logger.Fatal(err)
-		}
-
-		if !fi.IsDir(){
-			data, err := os.Open(file)
+		//This delay is to ensure the files don't get a sudden "file aleady close" error
+		time.Sleep(20 * time.Millisecond)
+		go func() {
+			err := compressFile(targetFile, file, fi, folderPath)
 			if err != nil {
 				logger.Fatal(err)
 			}
+		}()
 
-			fmt.Printf("[%s] Compressing: %s (%d bytes)\n", filepath.Base(folderPath) ,relPath, fi.Size())
-			if _, err := io.Copy(tw, data); err != nil {
-				logger.Fatal(err)
-			}
-		}
 		return nil
 	})
 
-	if err := tw.Close(); err != nil {
-		logger.Fatal(err)
-	}
-
-	if err := zr.Close(); err != nil {
-		logger.Fatal(err)
-	}
-
-
+	//Wait until all file writes all done
+	time.Sleep(5 * time.Second)
 	fmt.Printf("[%s] Compression Done.\n", filepath.Base(folderPath))
 	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, filepath.Base(folderPath), SQL.SQLStage_Compress, SQL.REMOTE_NONE, "Compression complete.", time.Now())
 }
