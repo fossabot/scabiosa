@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"os"
 	"scabiosa/Compressor"
@@ -21,10 +22,11 @@ func main(){
 		destPath := checkTmpPath(config, backupItem.CreateLocalBackup)
 
 		bakFile := Compressor.CreateBakFile(backupItem.BackupName + getTimeSuffix(), backupItem.FolderPath, destPath)
-		StorageTypes.UploadFile(storage, destPath + string(os.PathSeparator) + bakFile)
+		fmt.Printf(bakFile)
+		StorageTypes.UploadFile(storage, bakFile)
 
 		if !backupItem.CreateLocalBackup {
-			_ = os.Remove(destPath + string(os.PathSeparator) + bakFile)
+			_ = os.Remove(bakFile)
 			SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_DeleteTmp, SQL.REMOTE_NONE, "Deleted tmp file" ,time.Now())
 		}
 
@@ -32,6 +34,8 @@ func main(){
 
 }
 
+//TODO Implement SQL Backup entries
+//TODO SQL Log backupName is still != config.BackupMane
 
 func getTimeSuffix() string{
 	currTime := time.Now()
