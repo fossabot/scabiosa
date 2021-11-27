@@ -43,6 +43,12 @@ func checkIfBackupTableExist(db *sql.DB, mariadb MariaDBConnector) bool {
 	return true
 }
 
+func checkIfBackupEntryExist(db *sql.DB, mariadb MariaDBConnector, backupName string) bool {
+	rows, _ := db.Query("SELECT * FROM `" + mariadb.Database + "`.Backups WHERE BackupName = '" + backupName + "';")
+	if !rows.Next(){ return false; }
+	return true
+}
+
 func createMariaDBConnection(mariadb MariaDBConnector) *sql.DB{
 	logger := Logging.DetailedLogger("MariaDB", "createConnection")
 	db, err := sql.Open("mysql", mariadb.DbUser + ":" + mariadb.DbPassword + "@(" + mariadb.Address +  ":" +strconv.Itoa(int(mariadb.Port))+ ")/" + mariadb.Database)
@@ -89,4 +95,22 @@ func (mariadb MariaDBConnector) newLogEntry(uuid uuid.UUID, logType LogType, bac
 	}
 
 }
-func (mariadb MariaDBConnector) newBackupEntry(uuid uuid.UUID, backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string, durationToBackup time.Duration, hadErrors bool){}
+
+
+func (mariadb MariaDBConnector) newBackupEntry(uuid uuid.UUID, backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string, durationToBackup time.Duration, hadErrors bool){
+	logger := Logging.DetailedLogger("MariaDB", "newBackupEntry")
+
+	db := createMariaDBConnection(mariadb)
+
+	if checkIfBackupEntryExist(db, mariadb, backupName){
+		_, err := db.Query("UPDATE `" + mariadb.Database + "`.Backups SET LastBackup = ?, `DurationToBackup (s)` = ?, HadErrors = ? WHERE BackuoName = ?;",lastBackup, durationToBackup, hadErrors, backupName)
+		if err != nil {
+			logger.Fatal(err)
+		}
+	} else {
+		_, err := db.Query("INSERT INTO `" + mariadb.Database + "`.Backups VALUES (?, ?, ?, ?, ?, ?, ?, ?);", uuid.String(), lastBackup, localBackup, filePath, strconv.FormatInt(int64(storageType), 10), remotePath, durationToBackup, hadErrors)
+		if err != nil {
+			logger.Fatal(err)
+		}
+	}
+}
