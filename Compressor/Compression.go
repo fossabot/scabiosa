@@ -20,7 +20,7 @@ func CreateBakFile(fileName string, folderPath string, destinationPath string, b
 	pathToFile := destinationPath + string(os.PathSeparator) + fileName + ".bak"
 
 
-	fileToWrite, err := os.OpenFile(pathToFile, os.O_CREATE|os.O_RDWR, os.FileMode(600))
+	fileToWrite, err := os.OpenFile(pathToFile, os.O_CREATE|os.O_RDWR, os.FileMode(0775))
 	if err != nil {
 		logger.Fatal(err)
 	}
