@@ -23,7 +23,7 @@ type AzureFileStorage struct{
 }
 
 
-func (azure AzureFileStorage) upload(fileName string){
+func (azure AzureFileStorage) upload(fileName string, backupName string){
 	logger := Logging.DetailedLogger("AzureFileStorage", "upload")
 
 	file, err := os.Open(fileName)
@@ -48,8 +48,8 @@ func (azure AzureFileStorage) upload(fileName string){
 
 	ctx := context.Background()
 
-	fmt.Printf("[%s] Starting upload to Azure File Share...\n", strings.Trim(filepath.Base(fileName), ".bak"))
-	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, filepath.Base(fileName), SQL.SQLStage_Upload, SQL.REMOTE_AZURE_FILE, "Starting upload.", time.Now())
+	fmt.Printf("[%s] Starting upload to Azure File Share...\n", backupName, ".bak")
+	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Upload, SQL.REMOTE_AZURE_FILE, "Starting upload.", time.Now())
 
 	err = azfile.UploadFileToAzureFile(ctx, file, fileURL,
 		azfile.UploadToAzureFileOptions{
@@ -58,11 +58,15 @@ func (azure AzureFileStorage) upload(fileName string){
 			CacheControl: "no-transform",
 		},
 		Progress: func(bytesTransferred int64){
-			fmt.Printf("[%s] Uploaded %d of %d bytes.\n", strings.Trim(filepath.Base(fileName), ".bak") ,bytesTransferred, fileSize.Size())
+			fmt.Printf("[%s] Uploaded %d of %d bytes.\n", strings.Trim(backupName, ".bak") ,bytesTransferred, fileSize.Size())
 		}})
 
-	fmt.Printf("[%s] Upload finished.\n", strings.Trim(filepath.Base(fileName), ".bak"))
-	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, filepath.Base(fileName), SQL.SQLStage_Upload, SQL.REMOTE_AZURE_FILE, "Finished upload.", time.Now())
+	if err != nil{
+		logger.Fatal(err)
+	}
+
+	fmt.Printf("[%s] Upload finished.\n", strings.Trim(backupName, ".bak"))
+	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Upload, SQL.REMOTE_AZURE_FILE, "Finished upload.", time.Now())
 }
 
 func readConfig() []byte {

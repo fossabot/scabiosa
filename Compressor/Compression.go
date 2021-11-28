@@ -15,15 +15,16 @@ import (
 	"time"
 )
 
-func CreateBakFile(filename string, folderPath string, destinationPath string) string {
+func CreateBakFile(fileName string, folderPath string, destinationPath string, backupName string) string {
 	logger := Logging.DetailedLogger("Compression", "CreateBakFile")
 
 	var buf bytes.Buffer
-	compress(folderPath, &buf)
+	compress(folderPath, &buf, backupName)
 
-	fileName := filename + ".bak"
+	pathToFile := destinationPath + string(os.PathSeparator) + fileName + ".bak"
 
-	fileToWrite, err := os.OpenFile(destinationPath + string(os.PathSeparator) + fileName, os.O_CREATE|os.O_RDWR, os.FileMode(600))
+
+	fileToWrite, err := os.OpenFile(pathToFile, os.O_CREATE|os.O_RDWR, os.FileMode(600))
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -32,21 +33,21 @@ func CreateBakFile(filename string, folderPath string, destinationPath string) s
 		logger.Fatal(err)
 	}
 
-	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, filepath.Base(folderPath), SQL.SQLStage_Compress, SQL.REMOTE_NONE, "File successfully written.", time.Now())
+	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Compress, SQL.REMOTE_NONE, "File successfully written.", time.Now())
 
 
 	return fileName
 }
 
 
-func compress(folderPath string, buf io.Writer){
+func compress(folderPath string, buf io.Writer, backupName string){
 	logger := Logging.DetailedLogger("Gzip", "compress")
 
 	zr, _ := gzip.NewWriterLevel(buf, flate.BestCompression)
 	tw := tar.NewWriter(zr)
 
 	fmt.Printf("[%s] Start compression...\n", filepath.Base(folderPath))
-	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, filepath.Base(folderPath), SQL.SQLStage_Compress, SQL.REMOTE_NONE, "Start compression", time.Now())
+	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Compress, SQL.REMOTE_NONE, "Start compression", time.Now())
 	filepath.Walk(folderPath, func(file string, fi os.FileInfo, err error) error {
 		header, err := tar.FileInfoHeader(fi, file)
 		if err != nil {
@@ -84,5 +85,5 @@ func compress(folderPath string, buf io.Writer){
 
 
 	fmt.Printf("[%s] Compression Done.\n", filepath.Base(folderPath))
-	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, filepath.Base(folderPath), SQL.SQLStage_Compress, SQL.REMOTE_NONE, "Compression complete.", time.Now())
+	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Compress, SQL.REMOTE_NONE, "Compression complete.", time.Now())
 }

@@ -9,7 +9,7 @@ import (
 type SQLService interface {
 	createDefaultTables()
 	newLogEntry(uuid uuid.UUID, logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, description string, timestamp time.Time)
-	newBackupEntry(uuid uuid.UUID, backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string, durationToBackup time.Duration, hadErrors bool)
+	newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string)
 }
 
 func CreateDefaultTables(sqlService SQLService){
@@ -20,8 +20,8 @@ func NewLogEntry(sqlService SQLService, uuid uuid.UUID, logType LogType, backupN
 	sqlService.newLogEntry(uuid, logType, backupName, stage, storageType, description, timestamp)
 }
 
-func NewBackupEntry(sqlService SQLService, uuid uuid.UUID, backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string, durationToBackup time.Duration, hadErrors bool){
-	sqlService.newBackupEntry(uuid, backupName, lastBackup, localBackup, filePath, storageType, remotePath, durationToBackup, hadErrors)
+func NewBackupEntry(sqlService SQLService, backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string){
+	sqlService.newBackupEntry(backupName, lastBackup, localBackup, filePath, storageType, remotePath)
 }
 
 func GetSQLInstance() SQLService{

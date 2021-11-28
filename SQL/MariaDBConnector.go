@@ -43,6 +43,12 @@ func checkIfBackupTableExist(db *sql.DB, mariadb MariaDBConnector) bool {
 	return true
 }
 
+func checkIfBackupEntryExist(db *sql.DB, mariadb MariaDBConnector, backupName string) bool {
+	rows, _ := db.Query("SELECT * FROM `" + mariadb.Database + "`.Backups WHERE BackupName = '" + backupName + "';")
+	if !rows.Next(){ return false; }
+	return true
+}
+
 func createMariaDBConnection(mariadb MariaDBConnector) *sql.DB{
 	logger := Logging.DetailedLogger("MariaDB", "createConnection")
 	db, err := sql.Open("mysql", mariadb.DbUser + ":" + mariadb.DbPassword + "@(" + mariadb.Address +  ":" +strconv.Itoa(int(mariadb.Port))+ ")/" + mariadb.Database)
@@ -56,7 +62,7 @@ func (mariadb MariaDBConnector) createDefaultTables(){
 	logger := Logging.DetailedLogger("MariaDB", "createDefaultTables")
 
 	eventLogSQL := "create table " + mariadb.Database +".EventLog\n(\n    UUID          text                                       null,\n    LogType       enum ('INFO', 'WARNING', 'ERROR', 'FATAL') null,\n    BackupName    varchar(256)                               null,\n    Stage         enum ('COMPRESS', 'UPLOAD', 'DELETE TMP')  null,\n    RemoteStorage enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE')  null,\n    Description   text                                       null,\n    Timestamp     datetime                                   null\n);"
-	backupSQL := "create table " + mariadb.Database +".Backups\n(\n    UUID                   text                                      null,\n    BackupName             varchar(256)                              null,\n    LastBackup             datetime                                  null,\n    LocalBackup            tinyint(1)                                null,\n    FilePath               varchar(256)                              null,\n    RemoteStorage          enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE') null,\n    RemotePath             varchar(256)                              null,\n    `DurationToBackup (s)` double                                    null,\n    HadErrors              tinyint(1)                                null\n);\n\n"
+	backupSQL := "create table " + mariadb.Database +".Backups\n(\n    UUID                   text                                      null,\n    BackupName             varchar(256)                              null,\n    LastBackup             datetime                                  null,\n    LocalBackup            tinyint(1)                                null,\n    FilePath               varchar(256)                              null,\n    RemoteStorage          enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE') null,\n    RemotePath             varchar(256)                              null\n);\n\n"
 
 
 	db := createMariaDBConnection(mariadb)
@@ -80,7 +86,6 @@ func (mariadb MariaDBConnector) createDefaultTables(){
 
 func (mariadb MariaDBConnector) newLogEntry(uuid uuid.UUID, logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, description string, timestamp time.Time){
 	logger := Logging.DetailedLogger("MariaDB", "newLogEntry")
-
 	db := createMariaDBConnection(mariadb)
 
 	_, err := db.Query("INSERT INTO `" + mariadb.Database + "`.EventLog VALUES (?, ?, ?, ?, ?, ?, ?);", uuid.String(), strconv.FormatInt(int64(logType), 10), backupName, stage, strconv.FormatInt(int64(storageType), 10), description ,timestamp)
@@ -89,4 +94,22 @@ func (mariadb MariaDBConnector) newLogEntry(uuid uuid.UUID, logType LogType, bac
 	}
 
 }
-func (mariadb MariaDBConnector) newBackupEntry(uuid uuid.UUID, backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string, durationToBackup time.Duration, hadErrors bool){}
+
+
+func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string){
+	logger := Logging.DetailedLogger("MariaDB", "newBackupEntry")
+
+	db := createMariaDBConnection(mariadb)
+
+	if checkIfBackupEntryExist(db, mariadb, backupName){
+		_, err := db.Query("UPDATE `" + mariadb.Database + "`.Backups SET LastBackup = ? WHERE BackupName = ?;", lastBackup, backupName)
+		if err != nil {
+			logger.Fatal(err)
+		}
+	} else {
+		_, err := db.Query("INSERT INTO `" + mariadb.Database + "`.Backups VALUES (?, ?, ?, ?, ?, ?, ?);", uuid.New(), backupName, lastBackup, localBackup, filePath, strconv.FormatInt(int64(storageType), 10), remotePath)
+		if err != nil {
+			logger.Fatal(err)
+		}
+	}
+}

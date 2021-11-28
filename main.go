@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"os"
 	"scabiosa/Compressor"
@@ -20,14 +21,15 @@ func main(){
 		storage := StorageTypes.CheckStorageType(backupItem.StorageType)
 		destPath := checkTmpPath(config, backupItem.CreateLocalBackup)
 
-		bakFile := Compressor.CreateBakFile(backupItem.BackupName + getTimeSuffix(), backupItem.FolderPath, destPath)
-		StorageTypes.UploadFile(storage, destPath + string(os.PathSeparator) + bakFile)
+		bakFile := Compressor.CreateBakFile(backupItem.BackupName + getTimeSuffix(), backupItem.FolderPath, destPath, backupItem.BackupName)
+		fmt.Printf(bakFile)
+		StorageTypes.UploadFile(storage, bakFile, backupItem.BackupName)
 
 		if !backupItem.CreateLocalBackup {
-			_ = os.Remove(destPath + string(os.PathSeparator) + bakFile)
+			_ = os.Remove(bakFile)
 			SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_DeleteTmp, SQL.REMOTE_NONE, "Deleted tmp file" ,time.Now())
 		}
-
+		SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), backupItem.CreateLocalBackup, backupItem.FolderPath, StorageTypes.CheckRemoteStorageType(backupItem.StorageType), StorageTypes.GetAzureStorage().TargetDirectory)
 	}
 
 }
