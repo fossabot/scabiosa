@@ -30,7 +30,7 @@ func CreateBakFile(fileName string, folderPath string, destinationPath string, b
 	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Compress, SQL.REMOTE_NONE, "File successfully written.", time.Now())
 
 
-	return fileName
+	return pathToFile
 }
 
 func compress(fileToWrite *os.File, folderPath string, backupName string){

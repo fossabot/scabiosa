@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/google/uuid"
 	"os"
 	"scabiosa/Compressor"
@@ -22,7 +21,6 @@ func main(){
 		destPath := checkTmpPath(config, backupItem.CreateLocalBackup)
 
 		bakFile := Compressor.CreateBakFile(backupItem.BackupName + getTimeSuffix(), backupItem.FolderPath, destPath, backupItem.BackupName)
-		fmt.Printf(bakFile)
 		StorageTypes.UploadFile(storage, bakFile, backupItem.BackupName)
 
 		if !backupItem.CreateLocalBackup {

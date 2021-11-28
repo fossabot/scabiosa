@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/Azure/azure-storage-file-go/azfile"
 	"github.com/google/uuid"
+	"github.com/cheggaaa/pb/v3"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -51,6 +52,9 @@ func (azure AzureFileStorage) upload(fileName string, backupName string){
 	fmt.Printf("[%s] Starting upload to Azure File Share...\n", backupName, ".bak")
 	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Upload, SQL.REMOTE_AZURE_FILE, "Starting upload.", time.Now())
 
+
+	progressBar := pb.StartNew(int(fileSize.Size()))
+	progressBar.Set(pb.Bytes, true)
 	err = azfile.UploadFileToAzureFile(ctx, file, fileURL,
 		azfile.UploadToAzureFileOptions{
 		Parallelism: 3,
@@ -58,13 +62,14 @@ func (azure AzureFileStorage) upload(fileName string, backupName string){
 			CacheControl: "no-transform",
 		},
 		Progress: func(bytesTransferred int64){
-			fmt.Printf("[%s] Uploaded %d of %d bytes.\n", strings.Trim(backupName, ".bak") ,bytesTransferred, fileSize.Size())
+			progressBar.SetCurrent(bytesTransferred)
+			//fmt.Printf("[%s] Uploaded %d of %d bytes.\n", strings.Trim(backupName, ".bak") ,bytesTransferred, fileSize.Size())
 		}})
 
 	if err != nil{
 		logger.Fatal(err)
 	}
-
+	progressBar.Finish()
 	fmt.Printf("[%s] Upload finished.\n", strings.Trim(backupName, ".bak"))
 	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Upload, SQL.REMOTE_AZURE_FILE, "Finished upload.", time.Now())
 }
