@@ -34,8 +34,6 @@ func main(){
 
 }
 
-//TODO Implement SQL Backup entries
-//TODO SQL Log backupName is still != config.BackupMane
 
 func getTimeSuffix() string{
 	currTime := time.Now()
