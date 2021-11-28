@@ -9,7 +9,7 @@ Please keep in mind that this project is WIP.
 
 
 ## Database Types
-- MariaDB (done!)
+- MariaDB
 - MySQL (soon)
 - MS-SQL (far future)
 
@@ -21,7 +21,7 @@ Please keep in mind that this project is WIP.
 ## Storage types
 - Local storage (soon)
 - Azure Blob Storage (planned)
-- Azure File Share (done!)
+- Azure File Share
 - S3 Bucket (far future)
 - Dropbox (far future)
 - OneDrive (far future)
