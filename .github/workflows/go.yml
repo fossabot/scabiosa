@@ -19,11 +19,16 @@ jobs:
       
     - name: Bump version and push tag
       id: tag_version
-      uses: mathieudutour/github-tag-action@v5.6
-      env:
-        default_bump: minor
+      uses: mathieudutour/github-tag-action@v6.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        default_bump: minor
+        release_branches: master
+        custom_release_rules: |
+          release:release,
+          bug:patch,
+          fix:patch,
+          feature:minor
         
     - name: Create Release
       id: create_release
