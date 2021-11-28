@@ -43,7 +43,7 @@ func checkTmpPath(config Tools.Config, createLocalBackup bool) string{
 	logger := Logging.DetailedLogger("mainThread", "checkTmpPath")
 	if !createLocalBackup{
 		if _, err := os.Stat("tmp"); os.IsNotExist(err) {
-			dirErr := os.Mkdir("tmp", 600)
+			dirErr := os.Mkdir("tmp", 0775)
 			if dirErr != nil {
 				logger.Fatal(err)
 			}
