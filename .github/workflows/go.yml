@@ -23,6 +23,7 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         release_branches: master
+        default_bump: minor
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v1
