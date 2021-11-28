@@ -25,7 +25,7 @@ jobs:
         default_bump: minor
         release_branches: master
         custom_release_rules: |
-          release:release,
+          release:major,
           bug:patch,
           fix:patch,
           feature:minor
