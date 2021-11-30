@@ -39,6 +39,7 @@ Please keep in mind that this project is WIP.
 |---------------------|:----------------:|------------------------------------------------|
 | localBackupPath     | string           | Path where local backups are stored            |
 | **sqlConfig**       | ---------------- | ---------------------------------------------- | 
+| enableSQL           | boolean          | Enable/Disables the SQL entries
 | sqlType             | string           | See [DatabaseTypes](#database-types)           |
 | sql-address         | string           | Address to the SQL Server                      |
 | sql-port            | uint16           | SQL Server Port                                |
