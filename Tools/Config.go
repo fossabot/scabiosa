@@ -9,7 +9,8 @@ import (
 type Config struct {
 	LocalBackupPath string `json:"localBackupPath"`
 	SQLConfig struct{
-		SqlType string `json:"sqlType"`
+		EnableSQL bool   `json:"enableSQL"`
+		SqlType   string `json:"sqlType"`
 		SqlAddress string `json:"sql-address"`
 		SqlPort uint16 `json:"sql-port"`
 		Database string `json:"database"`

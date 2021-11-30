@@ -13,19 +13,30 @@ type SQLService interface {
 }
 
 func CreateDefaultTables(sqlService SQLService){
-	sqlService.createDefaultTables()
+	config := Tools.GetConfig()
+	if config.SQLConfig.EnableSQL{
+		sqlService.createDefaultTables()
+	}
 }
 
 func NewLogEntry(sqlService SQLService, uuid uuid.UUID, logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, description string, timestamp time.Time){
-	sqlService.newLogEntry(uuid, logType, backupName, stage, storageType, description, timestamp)
+	config := Tools.GetConfig()
+	if config.SQLConfig.EnableSQL{
+		sqlService.newLogEntry(uuid, logType, backupName, stage, storageType, description, timestamp)
+	}
 }
 
 func NewBackupEntry(sqlService SQLService, backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string){
-	sqlService.newBackupEntry(backupName, lastBackup, localBackup, filePath, storageType, remotePath)
+	config := Tools.GetConfig()
+	if config.SQLConfig.EnableSQL{
+		sqlService.newBackupEntry(backupName, lastBackup, localBackup, filePath, storageType, remotePath)
+	}
 }
 
 func GetSQLInstance() SQLService{
 	config := Tools.GetConfig()
+
+	if !config.SQLConfig.EnableSQL { return nil }
 
 	switch config.SQLConfig.SqlType {
 		case "mariadb": {return GetMariaDBInstance(config)}
