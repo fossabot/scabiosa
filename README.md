@@ -3,8 +3,8 @@
 Please keep in mind that this project is WIP.
 
 ## What can it do?
-- Backup you stuff via a dynamic configuration (done!)
-- Log the Backup progress to a database (in progress)
+- Backup you stuff via a dynamic configuration
+- Log the Backup progress to a database 
 - Upload the files to a remote storage of your choice (see [Storage Types](#storage-types))
 
 
@@ -39,6 +39,7 @@ Please keep in mind that this project is WIP.
 |---------------------|:----------------:|------------------------------------------------|
 | localBackupPath     | string           | Path where local backups are stored            |
 | **sqlConfig**       | ---------------- | ---------------------------------------------- | 
+| enableSQL           | boolean          | Enable/Disables the SQL entries
 | sqlType             | string           | See [DatabaseTypes](#database-types)           |
 | sql-address         | string           | Address to the SQL Server                      |
 | sql-port            | uint16           | SQL Server Port                                |

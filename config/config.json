@@ -1,7 +1,7 @@
 {
   "localBackupPath": "",
   "sqlConfig": {
-    "sqlType": "",
+    "enableSQL": false,
     "sql-address": "",
     "sql-port": 0,
     "database": "",
