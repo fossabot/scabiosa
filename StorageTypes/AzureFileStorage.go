@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Azure/azure-storage-file-go/azfile"
-	"github.com/google/uuid"
 	"github.com/cheggaaa/pb/v3"
+	"github.com/google/uuid"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -24,7 +24,7 @@ type AzureFileStorage struct{
 }
 
 
-func (azure AzureFileStorage) upload(fileName string, backupName string){
+func (azure AzureFileStorage) upload(fileName string, backupName string, destinationPath string){
 	logger := Logging.DetailedLogger("AzureFileStorage", "upload")
 
 	file, err := os.Open(fileName)
@@ -41,6 +41,10 @@ func (azure AzureFileStorage) upload(fileName string, backupName string){
 	credential, err := azfile.NewSharedKeyCredential(azure.StorageAccountName, azure.StorageAccountKey)
 	if err != nil{
 		logger.Fatal(err)
+	}
+
+	if destinationPath != ""{
+		azure.TargetDirectory = destinationPath
 	}
 
 	u, _ := url.Parse(fmt.Sprintf("https://%s.file.core.windows.net/%s/%s/%s", azure.StorageAccountName, azure.FileshareName ,azure.TargetDirectory, filepath.Base(fileName)))

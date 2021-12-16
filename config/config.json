@@ -13,6 +13,7 @@
       "backupName": "",
       "folderPath": "",
       "storageType": "",
+      "targetPath": "",
       "createLocalBackup": false
     }
   ]

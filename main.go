@@ -18,10 +18,10 @@ func main(){
 
 	for _, backupItem := range config.FolderToBackup{
 		storage := StorageTypes.CheckStorageType(backupItem.StorageType)
-		destPath := checkTmpPath(config, backupItem.CreateLocalBackup)
+		destPath := checkTmpPath(config, backupItem.CreateLocalBackup, storage)
 
 		bakFile := Compressor.CreateBakFile(backupItem.BackupName + getTimeSuffix(), backupItem.FolderPath, destPath, backupItem.BackupName)
-		StorageTypes.UploadFile(storage, bakFile, backupItem.BackupName)
+		StorageTypes.UploadFile(storage, bakFile, backupItem.BackupName, backupItem.TargetPath)
 
 		if !backupItem.CreateLocalBackup {
 			_ = os.Remove(bakFile)
@@ -39,7 +39,7 @@ func getTimeSuffix() string{
 	return "_" + currTime.Format("02-01-2006_15-04")
 }
 
-func checkTmpPath(config Tools.Config, createLocalBackup bool) string{
+func checkTmpPath(config Tools.Config, createLocalBackup bool, storage StorageTypes.Storage) string{
 	logger := Logging.DetailedLogger("mainThread", "checkTmpPath")
 	if !createLocalBackup{
 		if _, err := os.Stat("tmp"); os.IsNotExist(err) {

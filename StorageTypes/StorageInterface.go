@@ -3,11 +3,11 @@ package StorageTypes
 import "scabiosa/SQL"
 
 type Storage interface {
-	upload(fileName string, backupName string)
+	upload(fileName string, backupName string, destinationPath string)
 }
 
-func UploadFile(storage Storage, fileName string, backupName string){
-	storage.upload(fileName, backupName)
+func UploadFile(storage Storage, fileName string, backupName string, destinationPath string){
+	storage.upload(fileName, backupName, destinationPath)
 }
 
 func CheckStorageType(storageType string) Storage{
