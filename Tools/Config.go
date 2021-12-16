@@ -25,12 +25,6 @@ type Config struct {
 		CreateLocalBackup bool `json:"createLocalBackup"`
 	} `json:"foldersToBackup"`
 }
-type Backup struct{
-	backupName string
-	folderPath string
-	storageType string
-	createLocalBackup bool
-}
 
 func readConfig() []byte {
 	logger := Logging.DetailedLogger("ConfigHandler", "readConfig")
