@@ -46,7 +46,7 @@ func main(){
 			backupItem.CreateLocalBackup = true
 			backupItem.RemoteTargetPath = "NONE"
 		}
-			SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), backupItem.CreateLocalBackup, backupItem.FolderPath, StorageTypes.CheckRemoteStorageType(backupItem.RemoteStorageType), backupItem.RemoteTargetPath, backupItem.LocalTargetPath)
+		SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), backupItem.CreateLocalBackup, backupItem.FolderPath, StorageTypes.CheckRemoteStorageType(backupItem.RemoteStorageType), backupItem.RemoteTargetPath, backupItem.LocalTargetPath)
 	}
 
 }
