@@ -11,7 +11,6 @@ Trello board: [Click me!](https://trello.com/b/6zWLE6Jm)
 
 ## Planned features for the Future!
 - Backup restore
-- DB Upgrade
 - Service for scheduled updates
 - (Maybe) a web interface
 
