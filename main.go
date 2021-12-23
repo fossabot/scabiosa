@@ -36,6 +36,8 @@ func main(){
 		}
 
 		if !backupItem.CreateLocalBackup && backupItem.RemoteStorageType != "none"{
+			backupItem.LocalTargetPath = "NONE"
+
 			_ = os.Remove(bakFile)
 			SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_DeleteTmp, SQL.REMOTE_NONE, "Deleted tmp file" ,time.Now())
 		}
