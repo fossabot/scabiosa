@@ -12,9 +12,10 @@
     {
       "backupName": "",
       "folderPath": "",
-      "storageType": "",
-      "targetPath": "",
-      "createLocalBackup": false
+      "remoteStorageType": "",
+      "remoteTargetPath": "",
+      "createLocalBackup": false,
+      "localTargetPath": ""
     }
   ]
 }
