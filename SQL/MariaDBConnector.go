@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
+	"os"
 	"scabiosa/Logging"
 	"scabiosa/Tools"
 	"strconv"
@@ -61,10 +62,9 @@ func createMariaDBConnection(mariadb MariaDBConnector) *sql.DB{
 func (mariadb MariaDBConnector) createDefaultTables(){
 	logger := Logging.DetailedLogger("MariaDB", "createDefaultTables")
 
-	eventLogSQL := "create table " + mariadb.Database +".EventLog(UUID text null, LogType enum ('INFO', 'WARNING', 'ERROR', 'FATAL') null, BackupName varchar(256) null, Stage enum ('COMPRESS', 'UPLOAD', 'DELETE TMP')  null, RemoteStorage enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE') null, Description text null, Timestamp datetime null);"
-	backupSQL := "create table " + mariadb.Database +".Backups(UUID text null, BackupName varchar(256) null, LastBackup datetime null, LocalBackup tinyint(1) null, FilePath varchar(256) null,  RemoteStorage enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE') null, RemotePath varchar(256) null);"
-
-
+	eventLogSQL := "create table " + mariadb.Database +".EventLog(UUID text null, LogType enum ('INFO', 'WARNING', 'ERROR', 'FATAL') null, Hostname varchar(256) null,BackupName varchar(256) null, Stage enum ('COMPRESS', 'UPLOAD', 'DELETE TMP')  null, RemoteStorage enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE') null, Description text null, Timestamp datetime null);"
+	backupSQL := "create table " + mariadb.Database +".Backups(UUID text null, Hostname varchar(256) null, BackupName varchar(256) null, LastBackup datetime null, LocalBackup tinyint(1) null, FilePath varchar(256) null,  RemoteStorage enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE') null, RemotePath varchar(256) null);"
+	
 	db := createMariaDBConnection(mariadb)
 
 	if !checkIfBackupTableExist(db, mariadb){
@@ -88,7 +88,9 @@ func (mariadb MariaDBConnector) newLogEntry(uuid uuid.UUID, logType LogType, bac
 	logger := Logging.DetailedLogger("MariaDB", "newLogEntry")
 	db := createMariaDBConnection(mariadb)
 
-	_, err := db.Query("INSERT INTO `" + mariadb.Database + "`.EventLog VALUES (?, ?, ?, ?, ?, ?, ?);", uuid.String(), strconv.FormatInt(int64(logType), 10), backupName, stage, strconv.FormatInt(int64(storageType), 10), description ,timestamp)
+	hostname, _ := os.Hostname()
+
+	_, err := db.Query("INSERT INTO `" + mariadb.Database + "`.EventLog VALUES (?, ?, ?, ?, ?, ?, ?, ?);", uuid.String(), strconv.FormatInt(int64(logType), 10), hostname, backupName, stage, strconv.FormatInt(int64(storageType), 10), description ,timestamp)
 	if err != nil{
 		logger.Fatal(err)
 	}
@@ -98,8 +100,9 @@ func (mariadb MariaDBConnector) newLogEntry(uuid uuid.UUID, logType LogType, bac
 
 func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string){
 	logger := Logging.DetailedLogger("MariaDB", "newBackupEntry")
-
 	db := createMariaDBConnection(mariadb)
+
+	hostname, _ := os.Hostname()
 
 	if checkIfBackupEntryExist(db, mariadb, backupName){
 		_, err := db.Query("UPDATE `" + mariadb.Database + "`.Backups SET LastBackup = ? WHERE BackupName = ?;", lastBackup, backupName)
@@ -107,7 +110,7 @@ func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup tim
 			logger.Fatal(err)
 		}
 	} else {
-		_, err := db.Query("INSERT INTO `" + mariadb.Database + "`.Backups VALUES (?, ?, ?, ?, ?, ?, ?);", uuid.New(), backupName, lastBackup, localBackup, filePath, strconv.FormatInt(int64(storageType), 10), remotePath)
+		_, err := db.Query("INSERT INTO `" + mariadb.Database + "`.Backups VALUES (?, ?, ?, ?, ?, ?, ?, ?);", uuid.New(), hostname, backupName, lastBackup, localBackup, filePath, strconv.FormatInt(int64(storageType), 10), remotePath)
 		if err != nil {
 			logger.Fatal(err)
 		}
