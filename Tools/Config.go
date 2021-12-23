@@ -21,8 +21,9 @@ type Config struct {
 		BackupName string `json:"backupName"`
 		FolderPath string `json:"folderPath"`
 		RemoteStorageType string `json:"remoteStorageType"`
-		TargetPath string `json:"targetPath"`
-		CreateLocalBackup bool `json:"createLocalBackup"`
+		RemoteTargetPath string `json:"remoteTargetPath"`
+		CreateLocalBackup bool   `json:"createLocalBackup"`
+		LocalTargetPath   string `json:"LocalTargetPath"`
 	} `json:"foldersToBackup"`
 }
 
