@@ -103,7 +103,7 @@ func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup tim
 	hostname, _ := os.Hostname()
 
 	if checkIfBackupEntryExist(db, mariadb, backupName, hostname){
-		_, err := db.Query("UPDATE `" + mariadb.Database + "`.Backups SET LastBackup = ? WHERE Hostname = ? AND BackupName = ?;", lastBackup, hostname, backupName)
+		_, err := db.Query("UPDATE `" + mariadb.Database + "`.Backups SET LastBackup = ?, LocalBackup = ?, RemoteStorage = ?, RemotePath = ?, LocalPath = ? WHERE Hostname = ? AND BackupName = ?;",lastBackup, localBackup, strconv.FormatInt(int64(storageType), 10), remotePath, localPath, hostname, backupName)
 		if err != nil {
 			logger.Fatal(err)
 		}
