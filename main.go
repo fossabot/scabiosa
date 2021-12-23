@@ -17,17 +17,28 @@ func main(){
 	SQL.CreateDefaultTables(SQL.GetSQLInstance())
 
 	for _, backupItem := range config.FolderToBackup{
-		storage := StorageTypes.CheckStorageType(backupItem.StorageType)
-		destPath := checkTmpPath(config, backupItem.CreateLocalBackup)
+
+		var storage StorageTypes.Storage
+		var destPath string
+
+		if backupItem.RemoteStorageType != "none"{
+			storage = StorageTypes.CheckStorageType(backupItem.RemoteStorageType)
+			destPath = checkTmpPath(backupItem.CreateLocalBackup, backupItem.TargetPath)
+		} else {
+			destPath = backupItem.TargetPath
+		}
 
 		bakFile := Compressor.CreateBakFile(backupItem.BackupName + getTimeSuffix(), backupItem.FolderPath, destPath, backupItem.BackupName)
-		StorageTypes.UploadFile(storage, bakFile, backupItem.BackupName)
 
-		if !backupItem.CreateLocalBackup {
-			_ = os.Remove(bakFile)
-			SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_DeleteTmp, SQL.REMOTE_NONE, "Deleted tmp file" ,time.Now())
+		if backupItem.RemoteStorageType != "none"{
+			StorageTypes.UploadFile(storage, bakFile, backupItem.BackupName, backupItem.TargetPath)
 		}
-		SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), backupItem.CreateLocalBackup, backupItem.FolderPath, StorageTypes.CheckRemoteStorageType(backupItem.StorageType), StorageTypes.GetAzureStorage().TargetDirectory)
+
+		if !backupItem.CreateLocalBackup && backupItem.RemoteStorageType != "none"{
+			_ = os.Remove(bakFile)
+		SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_DeleteTmp, SQL.REMOTE_NONE, "Deleted tmp file" ,time.Now())
+	}
+	SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), backupItem.CreateLocalBackup, backupItem.FolderPath, StorageTypes.CheckRemoteStorageType(backupItem.RemoteStorageType), StorageTypes.GetAzureStorage().TargetDirectory)
 	}
 
 }
@@ -39,9 +50,9 @@ func getTimeSuffix() string{
 	return "_" + currTime.Format("02-01-2006_15-04")
 }
 
-func checkTmpPath(config Tools.Config, createLocalBackup bool) string{
+func checkTmpPath(createLocalBackup bool, targetPath string) string{
 	logger := Logging.DetailedLogger("mainThread", "checkTmpPath")
-	if !createLocalBackup{
+	if !createLocalBackup {
 		if _, err := os.Stat("tmp"); os.IsNotExist(err) {
 			dirErr := os.Mkdir("tmp", 0775)
 			if dirErr != nil {
@@ -51,5 +62,5 @@ func checkTmpPath(config Tools.Config, createLocalBackup bool) string{
 		return "tmp"
 	}
 
-	return config.LocalBackupPath
+	return targetPath
 }
