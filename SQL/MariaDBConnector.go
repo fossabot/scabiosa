@@ -61,8 +61,8 @@ func createMariaDBConnection(mariadb MariaDBConnector) *sql.DB{
 func (mariadb MariaDBConnector) createDefaultTables(){
 	logger := Logging.DetailedLogger("MariaDB", "createDefaultTables")
 
-	eventLogSQL := "create table " + mariadb.Database +".EventLog\n(\n    UUID          text                                       null,\n    LogType       enum ('INFO', 'WARNING', 'ERROR', 'FATAL') null,\n    BackupName    varchar(256)                               null,\n    Stage         enum ('COMPRESS', 'UPLOAD', 'DELETE TMP')  null,\n    RemoteStorage enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE')  null,\n    Description   text                                       null,\n    Timestamp     datetime                                   null\n);"
-	backupSQL := "create table " + mariadb.Database +".Backups\n(\n    UUID                   text                                      null,\n    BackupName             varchar(256)                              null,\n    LastBackup             datetime                                  null,\n    LocalBackup            tinyint(1)                                null,\n    FilePath               varchar(256)                              null,\n    RemoteStorage          enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE') null,\n    RemotePath             varchar(256)                              null\n);\n\n"
+	eventLogSQL := "create table " + mariadb.Database +".EventLog(UUID text null, LogType enum ('INFO', 'WARNING', 'ERROR', 'FATAL') null, BackupName varchar(256) null, Stage enum ('COMPRESS', 'UPLOAD', 'DELETE TMP')  null, RemoteStorage enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE') null, Description text null, Timestamp datetime null);"
+	backupSQL := "create table " + mariadb.Database +".Backups(UUID text null, BackupName varchar(256) null, LastBackup datetime null, LocalBackup tinyint(1) null, FilePath varchar(256) null,  RemoteStorage enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE') null, RemotePath varchar(256) null);"
 
 
 	db := createMariaDBConnection(mariadb)
