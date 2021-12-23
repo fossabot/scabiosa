@@ -31,7 +31,6 @@ func GetMariaDBInstance(config Tools.Config) MariaDBConnector {
 	return mariadb
 }
 
-
 func checkIfEventLogTableExist(db *sql.DB, mariadb MariaDBConnector) bool {
 	rows, _ := db.Query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'EventLog';", mariadb.Database)
 	if !rows.Next(){ return false }
@@ -64,7 +63,7 @@ func (mariadb MariaDBConnector) createDefaultTables(){
 
 	eventLogSQL := "create table " + mariadb.Database +".EventLog(UUID text null, LogType enum ('INFO', 'WARNING', 'ERROR', 'FATAL') null, Hostname varchar(256) null,BackupName varchar(256) null, Stage enum ('COMPRESS', 'UPLOAD', 'DELETE TMP')  null, RemoteStorage enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE') null, Description text null, Timestamp datetime null);"
 	backupSQL := "create table " + mariadb.Database +".Backups(UUID text null, Hostname varchar(256) null, BackupName varchar(256) null, LastBackup datetime null, LocalBackup tinyint(1) null, FilePath varchar(256) null,  RemoteStorage enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE') null, RemotePath varchar(256) null);"
-	
+
 	db := createMariaDBConnection(mariadb)
 
 	if !checkIfBackupTableExist(db, mariadb){
@@ -96,7 +95,6 @@ func (mariadb MariaDBConnector) newLogEntry(uuid uuid.UUID, logType LogType, bac
 	}
 
 }
-
 
 func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string){
 	logger := Logging.DetailedLogger("MariaDB", "newBackupEntry")
