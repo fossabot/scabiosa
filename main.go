@@ -40,7 +40,7 @@ func main(){
 			SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_DeleteTmp, SQL.REMOTE_NONE, "Deleted tmp file" ,time.Now())
 		}
 
-			SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), backupItem.CreateLocalBackup, backupItem.FolderPath, StorageTypes.CheckRemoteStorageType(backupItem.RemoteStorageType), backupItem.LocalTargetPath, backupItem.LocalTargetPath)
+			SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), backupItem.CreateLocalBackup, backupItem.FolderPath, StorageTypes.CheckRemoteStorageType(backupItem.RemoteStorageType), backupItem.RemoteTargetPath, backupItem.LocalTargetPath)
 	}
 
 }
