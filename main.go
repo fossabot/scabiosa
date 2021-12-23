@@ -12,6 +12,7 @@ import (
 )
 
 func main(){
+	Tools.CheckIfConfigExists()
 	config := Tools.GetConfig()
 
 	SQL.CreateDefaultTables(SQL.GetSQLInstance())

@@ -36,9 +36,40 @@ func readConfig() []byte {
 	return file
 }
 
+func CheckIfConfigExists(){
+	logger := Logging.DetailedLogger("ConfigHandler", "CheckIfConfigExists")
+
+	if _, err := os.Stat("config/config.json"); os.IsNotExist(err){
+		_, fileErr := os.OpenFile("config/config.json", os.O_CREATE, 0775)
+		if fileErr != nil{
+			logger.Fatal(fileErr)
+		}
+		generateDefaultConfig()
+	}
+}
+
+func generateDefaultConfig() {
+	logger := Logging.DetailedLogger("ConfigHandler", "GenerateDefaultConfig")
+
+	var config Config
+	var conf []byte
+
+	conf, err := json.MarshalIndent(config, "", "\t")
+	//conf, err := json.Marshal(config)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	err = os.WriteFile("config/config.json", conf, 0755)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+}
 
 func GetConfig() Config {
-	logger := Logging.DetailedLogger("ConfigHandler", "GetConfig()")
+
+	logger := Logging.DetailedLogger("ConfigHandler", "GetConfig")
 	var config Config
 
 	err := json.Unmarshal(readConfig(), &config)
