@@ -57,5 +57,6 @@ Trello board: [Click me!](https://trello.com/b/6zWLE6Jm)
 | backupName                | string           | .bak file name                                 |
 | folderPath                | string           | Path to folder which should be backed up       |
 | remoteStorageType         | string           | See [StorageTypes](#storage-types)             |
-| targetPath                | string           | Sets the targetPath for local backups          |
+| remoteTargetPath          | string           | Sets the remotePath for remote backups         |
+| localTargetPath           | string           | Sets the targetPath for local backups          |
 | createLocalBackup         | boolean          | Sets if .bak file should also be saved locally |
