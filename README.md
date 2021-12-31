@@ -42,21 +42,30 @@ Trello board: [Click me!](https://trello.com/b/6zWLE6Jm)
 ## Config Explaination
 
 ### config.json
-| Field                     | Type             | Description                                    |
-|---------------------------|:----------------:|------------------------------------------------|
-| localBackupPath           | string           | Path where local backups are stored            |
-| **sqlConfig**             | ---------------- | ---------------------------------------------- | 
-| enableSQL                 | boolean          | Enable/Disables the SQL entries
-| sqlType                   | string           | See [DatabaseTypes](#database-types)           |
-| sql-address               | string           | Address to the SQL Server                      |
-| sql-port                  | uint16           | SQL Server Port                                |
-| database                  | string           | Database name                                  |
-| db-user                   | string           | SQL username from user which should be used    |
-| db-password               | string           | SQL password from user which should be used    |
-| **foldersToBackup**       | ---------------- | ---------------------------------------------- |
-| backupName                | string           | .bak file name                                 |
-| folderPath                | string           | Path to folder which should be backed up       |
-| remoteStorageType         | string           | See [StorageTypes](#storage-types)             |
-| remoteTargetPath          | string           | Sets the remotePath for remote backups         |
-| localTargetPath           | string           | Sets the targetPath for local backups          |
-| createLocalBackup         | boolean          | Sets if .bak file should also be saved locally |
+| Field                 |       Type       | Description                                    |
+|-----------------------|:----------------:|------------------------------------------------|
+| **foldersToBackup**   | ---------------- | ---------------------------------------------- |
+| backupName            |      string      | .bak file name                                 |
+| folderPath            |      string      | Path to folder which should be backed up       |
+| remoteStorageType     |      string      | See [StorageTypes](#storage-types)             |
+| remoteTargetPath      |      string      | Sets the remotePath for remote backups         |
+| localTargetPath       |      string      | Sets the targetPath for local backups          |
+| createLocalBackup     |     boolean      | Sets if .bak file should also be saved locally |
+
+### sql-config.json
+| Field        |       Type       | Description                                    |
+|--------------|:----------------:|------------------------------------------------|
+| enableSQL    |     boolean      | Enable/Disables the SQL entries                |
+| sqlType      |      string      | See [DatabaseTypes](#database-types)           |
+| sql-address  |      string      | Address to the SQL Server                      |
+| sql-port     |      uint16      | SQL Server Port                                |
+| database     |      string      | Database name                                  |
+| db-user      |      string      | SQL username from user which should be used    |
+| db-password  |      string      | SQL password from user which should be used    |
+
+### azure.json
+| Field              |  Type  | Description                       |
+|--------------------|:------:|-----------------------------------|
+| fileshareName      | string | The name of the Azure File Share  |
+| storageAccountName | string | Name of your storage account      |
+| storageAccountKey  | string | Key for the storage account       |
