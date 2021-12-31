@@ -12,19 +12,18 @@ import (
 	"path/filepath"
 	"scabiosa/Logging"
 	"scabiosa/SQL"
+	"scabiosa/Tools"
 	"strings"
 	"time"
 )
 
-type AzureFileStorage struct{
-	FileshareName string `json:"fileshareName"`
-	TargetDirectory string `json:"targetDirectory"`
-	StorageAccountName string `json:"storageAccountName"`
-	StorageAccountKey string `json:"storageAccountKey"`
+type AzureFileStorage struct {
+	FileshareName      string
+	StorageAccountName string
+	StorageAccountKey  string
 }
 
-
-func (azure AzureFileStorage) upload(fileName string, backupName string, destinationPath string){
+func (azure AzureFileStorage) upload(fileName string, backupName string, destinationPath string) {
 	logger := Logging.DetailedLogger("AzureFileStorage", "upload")
 
 	file, err := os.Open(fileName)
@@ -39,15 +38,11 @@ func (azure AzureFileStorage) upload(fileName string, backupName string, destina
 	}
 
 	credential, err := azfile.NewSharedKeyCredential(azure.StorageAccountName, azure.StorageAccountKey)
-	if err != nil{
+	if err != nil {
 		logger.Fatal(err)
 	}
 
-	if destinationPath != ""{
-		azure.TargetDirectory = destinationPath
-	}
-
-	u, _ := url.Parse(fmt.Sprintf("https://%s.file.core.windows.net/%s/%s/%s", azure.StorageAccountName, azure.FileshareName ,azure.TargetDirectory, filepath.Base(fileName)))
+	u, _ := url.Parse(fmt.Sprintf("https://%s.file.core.windows.net/%s/%s/%s", azure.StorageAccountName, azure.FileshareName, destinationPath, filepath.Base(fileName)))
 
 	fileURL := azfile.NewFileURL(*u, azfile.NewPipeline(credential, azfile.PipelineOptions{}))
 
@@ -56,21 +51,20 @@ func (azure AzureFileStorage) upload(fileName string, backupName string, destina
 	fmt.Printf("[%s] Starting upload to Azure File Share...\n", backupName, ".bak")
 	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Upload, SQL.REMOTE_AZURE_FILE, "Starting upload.", time.Now())
 
-
 	progressBar := pb.StartNew(int(fileSize.Size()))
 	progressBar.Set(pb.Bytes, true)
 	err = azfile.UploadFileToAzureFile(ctx, file, fileURL,
 		azfile.UploadToAzureFileOptions{
-		Parallelism: 3,
-		FileHTTPHeaders: azfile.FileHTTPHeaders{
-			CacheControl: "no-transform",
-		},
-		Progress: func(bytesTransferred int64){
-			progressBar.SetCurrent(bytesTransferred)
-			//fmt.Printf("[%s] Uploaded %d of %d bytes.\n", strings.Trim(backupName, ".bak") ,bytesTransferred, fileSize.Size())
-		}})
+			Parallelism: 3,
+			FileHTTPHeaders: azfile.FileHTTPHeaders{
+				CacheControl: "no-transform",
+			},
+			Progress: func(bytesTransferred int64) {
+				progressBar.SetCurrent(bytesTransferred)
+				//fmt.Printf("[%s] Uploaded %d of %d bytes.\n", strings.Trim(backupName, ".bak") ,bytesTransferred, fileSize.Size())
+			}})
 
-	if err != nil{
+	if err != nil {
 		logger.Fatal(err)
 	}
 	progressBar.Finish()
@@ -82,23 +76,27 @@ func readConfig() []byte {
 	logger := Logging.DetailedLogger("AzureFileStorage", "readConfig")
 
 	file, err := os.ReadFile("config/azure.json")
-	if err != nil{
+	if err != nil {
 		logger.Fatal(err)
 	}
 
 	return file
 }
 
-
 func GetAzureStorage() AzureFileStorage {
 	logger := Logging.DetailedLogger("AzureFileStorage", "GetAzureStorage")
 
-	var azureStorage AzureFileStorage
+	var azureConfig Tools.AzureConfig
+	var azureFileShare AzureFileStorage
 
-	jsonErr := json.Unmarshal(readConfig(), &azureStorage)
-	if jsonErr != nil{
+	jsonErr := json.Unmarshal(readConfig(), &azureConfig)
+	if jsonErr != nil {
 		logger.Fatal(jsonErr)
 	}
 
-	return azureStorage
+	azureFileShare.StorageAccountName = azureConfig.StorageAccountName
+	azureFileShare.StorageAccountKey = azureConfig.StorageAccountKey
+	azureFileShare.FileshareName = azureConfig.FileshareName
+
+	return azureFileShare
 }

@@ -17,3 +17,6 @@ scabiosa
 
 #tmp folder
 tmp/
+
+#config folder
+config/
