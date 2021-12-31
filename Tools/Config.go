@@ -16,6 +16,10 @@ type Config struct {
 		DbUser     string `json:"db-user"`
 		DbPassword string `json:"db-password"`
 	} `json:"sqlConfig"`
+type AzureConfig struct {
+	FileshareName      string `json:"fileshareName"`
+	StorageAccountName string `json:"storageAccountName"`
+	StorageAccountKey  string `json:"storageAccountKey"`
 	FolderToBackup []struct {
 		BackupName        string `json:"backupName"`
 		FolderPath        string `json:"folderPath"`
