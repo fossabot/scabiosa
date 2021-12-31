@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func NewStartBackupProc() *cli.Command {
+func StartBackupProc() *cli.Command {
 	logger := Logging.Logger("backup")
 
 	return &cli.Command{
