@@ -7,21 +7,20 @@ import (
 )
 
 type Config struct {
-	LocalBackupPath string `json:"localBackupPath"`
-	SQLConfig struct{
-		EnableSQL bool   `json:"enableSQL"`
-		SqlType   string `json:"sqlType"`
+	SQLConfig struct {
+		EnableSQL  bool   `json:"enableSQL"`
+		SqlType    string `json:"sqlType"`
 		SqlAddress string `json:"sql-address"`
-		SqlPort uint16 `json:"sql-port"`
-		Database string `json:"database"`
-		DbUser string `json:"db-user"`
+		SqlPort    uint16 `json:"sql-port"`
+		Database   string `json:"database"`
+		DbUser     string `json:"db-user"`
 		DbPassword string `json:"db-password"`
 	} `json:"sqlConfig"`
-	FolderToBackup []struct{
-		BackupName string `json:"backupName"`
-		FolderPath string `json:"folderPath"`
+	FolderToBackup []struct {
+		BackupName        string `json:"backupName"`
+		FolderPath        string `json:"folderPath"`
 		RemoteStorageType string `json:"remoteStorageType"`
-		RemoteTargetPath string `json:"remoteTargetPath"`
+		RemoteTargetPath  string `json:"remoteTargetPath"`
 		CreateLocalBackup bool   `json:"createLocalBackup"`
 		LocalTargetPath   string `json:"LocalTargetPath"`
 	} `json:"foldersToBackup"`
@@ -37,12 +36,12 @@ func readConfig() []byte {
 	return file
 }
 
-func CheckIfConfigExists(){
+func CheckIfConfigExists() {
 	logger := Logging.DetailedLogger("ConfigHandler", "CheckIfConfigExists")
 
-	if _, err := os.Stat("config/config.json"); os.IsNotExist(err){
+	if _, err := os.Stat("config/config.json"); os.IsNotExist(err) {
 		_, fileErr := os.OpenFile("config/config.json", os.O_CREATE, 0775)
-		if fileErr != nil{
+		if fileErr != nil {
 			logger.Fatal(fileErr)
 		}
 		generateDefaultConfig()
