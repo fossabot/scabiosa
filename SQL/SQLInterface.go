@@ -12,34 +12,39 @@ type SQLService interface {
 	newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string, localPath string)
 }
 
-func CreateDefaultTables(sqlService SQLService){
-	config := Tools.GetConfig()
-	if config.SQLConfig.EnableSQL{
+func CreateDefaultTables(sqlService SQLService) {
+	sqlConfig := Tools.GetSQLConfig()
+	if sqlConfig.EnableSQL {
 		sqlService.createDefaultTables()
 	}
 }
 
-func NewLogEntry(sqlService SQLService, uuid uuid.UUID, logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, description string, timestamp time.Time){
-	config := Tools.GetConfig()
-	if config.SQLConfig.EnableSQL{
+func NewLogEntry(sqlService SQLService, uuid uuid.UUID, logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, description string, timestamp time.Time) {
+	sqlConfig := Tools.GetSQLConfig()
+	if sqlConfig.EnableSQL {
 		sqlService.newLogEntry(uuid, logType, backupName, stage, storageType, description, timestamp)
 	}
 }
 
-func NewBackupEntry(sqlService SQLService, backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string, localPath string){
-	config := Tools.GetConfig()
-	if config.SQLConfig.EnableSQL{
+func NewBackupEntry(sqlService SQLService, backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string, localPath string) {
+	sqlConfig := Tools.GetSQLConfig()
+	if sqlConfig.EnableSQL {
 		sqlService.newBackupEntry(backupName, lastBackup, localBackup, filePath, storageType, remotePath, localPath)
 	}
 }
 
-func GetSQLInstance() SQLService{
-	config := Tools.GetConfig()
+func GetSQLInstance() SQLService {
+	sqlConfig := Tools.GetSQLConfig()
 
-	if !config.SQLConfig.EnableSQL { return nil }
+	if !sqlConfig.EnableSQL {
+		return nil
+	}
 
-	switch config.SQLConfig.SqlType {
-		case "mariadb": {return GetMariaDBInstance(config)}
+	switch sqlConfig.SqlType {
+	case "mariadb":
+		{
+			return GetMariaDBInstance(sqlConfig)
+		}
 	}
 
 	return nil

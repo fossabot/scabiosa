@@ -2,24 +2,28 @@ package Tools
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"scabiosa/Logging"
 )
 
-type Config struct {
-	SQLConfig struct {
-		EnableSQL  bool   `json:"enableSQL"`
-		SqlType    string `json:"sqlType"`
-		SqlAddress string `json:"sql-address"`
-		SqlPort    uint16 `json:"sql-port"`
-		Database   string `json:"database"`
-		DbUser     string `json:"db-user"`
-		DbPassword string `json:"db-password"`
-	} `json:"sqlConfig"`
+type SQLConfig struct {
+	EnableSQL  bool   `json:"enableSQL"`
+	SqlType    string `json:"sqlType"`
+	SqlAddress string `json:"sql-address"`
+	SqlPort    uint16 `json:"sql-port"`
+	Database   string `json:"database"`
+	DbUser     string `json:"db-user"`
+	DbPassword string `json:"db-password"`
+}
+
 type AzureConfig struct {
 	FileshareName      string `json:"fileshareName"`
 	StorageAccountName string `json:"storageAccountName"`
 	StorageAccountKey  string `json:"storageAccountKey"`
+}
+
+type Config struct {
 	FolderToBackup []struct {
 		BackupName        string `json:"backupName"`
 		FolderPath        string `json:"folderPath"`
@@ -40,6 +44,16 @@ func readConfig() []byte {
 	return file
 }
 
+func readSQLConfig() []byte {
+	logger := Logging.DetailedLogger("ConfigHandler", "readSQLConfig")
+
+	file, err := os.ReadFile("config/sql-config.json")
+	if err != nil {
+		logger.Fatal(err)
+	}
+	return file
+}
+
 func CheckIfConfigExists() {
 	logger := Logging.DetailedLogger("ConfigHandler", "CheckIfConfigExists")
 
@@ -48,27 +62,68 @@ func CheckIfConfigExists() {
 		if fileErr != nil {
 			logger.Fatal(fileErr)
 		}
-		generateDefaultConfig()
+		fmt.Printf("No configs detected. Please use 'scabiosa generate-config'\n")
+		os.Exit(0)
 	}
 }
 
-func generateDefaultConfig() {
-	logger := Logging.DetailedLogger("ConfigHandler", "GenerateDefaultConfig")
+func GenerateBaseConfig() {
+	logger := Logging.DetailedLogger("ConfigHandler", "GenerateBaseConfig")
+	var baseConfig Config
 
-	var config Config
-	var conf []byte
-
-	conf, err := json.MarshalIndent(config, "", "\t")
-	//conf, err := json.Marshal(config)
+	conf, err := json.MarshalIndent(baseConfig, "", "\t")
+	if err != nil {
+		logger.Fatal(err)
+	}
+	for _, s := range baseConfig.FolderToBackup {
+		s.BackupName = ""
+	}
+	err = os.WriteFile("config/config.json", conf, 0775)
 	if err != nil {
 		logger.Fatal(err)
 	}
 
-	err = os.WriteFile("config/config.json", conf, 0755)
+}
+
+func GenerateAzureConfig(azure AzureConfig) {
+	logger := Logging.DetailedLogger("ConfigHandler", "GenerateAzureConfig")
+
+	conf, err := json.MarshalIndent(azure, "", "\t")
 	if err != nil {
 		logger.Fatal(err)
 	}
 
+	err = os.WriteFile("config/azure.json", conf, 0775)
+	if err != nil {
+		logger.Fatal(err)
+	}
+}
+
+func GenerateSQLConfig(sqlConfig SQLConfig) {
+	logger := Logging.DetailedLogger("ConfigHandler", "GenerateSQLConfig")
+
+	conf, err := json.MarshalIndent(sqlConfig, "", "\t")
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	err = os.WriteFile("config/sql-config.json", conf, 0775)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+}
+
+func GetSQLConfig() SQLConfig {
+	logger := Logging.DetailedLogger("ConfigHandler", "GetSQLConfig")
+	var sqlConfig SQLConfig
+
+	err := json.Unmarshal(readSQLConfig(), &sqlConfig)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	return sqlConfig
 }
 
 func GetConfig() Config {
