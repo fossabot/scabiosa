@@ -3,6 +3,7 @@ package SQL
 import (
 	"database/sql"
 	"fmt"
+	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/google/uuid"
 	"net/url"
 	"scabiosa/Logging"
