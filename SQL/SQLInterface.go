@@ -49,6 +49,10 @@ func GetSQLInstance() SQLService {
 		{
 			return GetMariaDBInstance(sqlConfig)
 		}
+	case "mssql":
+		{
+			return GetMSSQLInstance(sqlConfig)
+		}
 	}
 
 	return nil
