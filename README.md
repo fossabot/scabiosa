@@ -16,12 +16,14 @@ Trello board: [Click me!](https://trello.com/b/6zWLE6Jm)
 
 ## Database Types
 - MariaDB
-- MySQL (soon)
-- MS-SQL (far future)
+- MySQL
+- MS-SQL
 
-| Database Type     | Config Type               |
-|-------------------|---------------------------|
-| MariaDB           | mariadb                   |
+| Database Type | Config Type |
+|---------------|-------------|
+| MariaDB       | mariadb     |
+ | MySQL         | mysql       |
+ | MS-SQL        | mssql       |
 
 
 ## Storage types
@@ -69,3 +71,38 @@ Trello board: [Click me!](https://trello.com/b/6zWLE6Jm)
 | fileshareName      | string | The name of the Azure File Share  |
 | storageAccountName | string | Name of your storage account      |
 | storageAccountKey  | string | Key for the storage account       |
+
+
+## Config Examples
+
+### config.json (Linux)
+```
+{
+  "foldersToBackup": [
+    {
+      "backupName": "my-backup",
+      "folderPath": "/path/to/folder/to/backup",
+      "remoteStorageType": "remote-type",
+      "remoteTargetPath": "path/to",
+      "createLocalBackup": true,
+      "localTargetPath": "/path/for/local/backup"
+    }
+  ]
+}
+```
+
+### config.json (Windows)
+```
+{
+  "foldersToBackup": [
+    {
+      "backupName": "my-backup",
+      "folderPath": "D:\\Path\\To\\Folder\\To\\Backup",
+      "remoteStorageType": "remote-type",
+      "remoteTargetPath": "path/to",
+      "createLocalBackup": true,
+      "localTargetPath": "E:\\Path\\For\\Local Backup"
+    }
+  ]
+}
+```

@@ -31,7 +31,7 @@ func GetMariaDBInstance(sqlConfig Tools.SQLConfig) MariaDBConnector {
 	return mariadb
 }
 
-func checkIfEventLogTableExist(db *sql.DB, mariadb MariaDBConnector) bool {
+func (mariadb MariaDBConnector) checkIfEventLogTableExist(db *sql.DB) bool {
 	rows, _ := db.Query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'EventLog';", mariadb.Database)
 	if !rows.Next() {
 		return false
@@ -39,7 +39,7 @@ func checkIfEventLogTableExist(db *sql.DB, mariadb MariaDBConnector) bool {
 	return true
 }
 
-func checkIfBackupTableExist(db *sql.DB, mariadb MariaDBConnector) bool {
+func (mariadb MariaDBConnector) checkIfBackupTableExist(db *sql.DB) bool {
 	rows, _ := db.Query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'Backups';", mariadb.Database)
 	if !rows.Next() {
 		return false
@@ -47,7 +47,7 @@ func checkIfBackupTableExist(db *sql.DB, mariadb MariaDBConnector) bool {
 	return true
 }
 
-func checkIfBackupEntryExist(db *sql.DB, mariadb MariaDBConnector, backupName string, hostname string) bool {
+func (mariadb MariaDBConnector) checkIfBackupEntryExist(db *sql.DB, backupName string, hostname string) bool {
 	rows, _ := db.Query("SELECT * FROM `"+mariadb.Database+"`.Backups WHERE Hostname = ? AND BackupName = ?;", hostname, backupName)
 	if !rows.Next() {
 		return false
@@ -72,14 +72,14 @@ func (mariadb MariaDBConnector) createDefaultTables() {
 
 	db := createMariaDBConnection(mariadb)
 
-	if !checkIfBackupTableExist(db, mariadb) {
+	if !mariadb.checkIfBackupTableExist(db) {
 		_, err := db.Exec(backupSQL)
 		if err != nil {
 			logger.Fatal(err)
 		}
 	}
 
-	if !checkIfEventLogTableExist(db, mariadb) {
+	if !mariadb.checkIfEventLogTableExist(db) {
 		_, err := db.Exec(eventLogSQL)
 		if err != nil {
 			logger.Fatal(err)
@@ -108,7 +108,7 @@ func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup tim
 
 	hostname, _ := os.Hostname()
 
-	if checkIfBackupEntryExist(db, mariadb, backupName, hostname) {
+	if mariadb.checkIfBackupEntryExist(db, backupName, hostname) {
 		_, err := db.Query("UPDATE `"+mariadb.Database+"`.Backups SET LastBackup = ?, LocalBackup = ?, RemoteStorage = ?, RemotePath = ?, LocalPath = ? WHERE Hostname = ? AND BackupName = ?;", lastBackup, localBackup, strconv.FormatInt(int64(storageType), 10), remotePath, localPath, hostname, backupName)
 		if err != nil {
 			logger.Fatal(err)
