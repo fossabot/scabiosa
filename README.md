@@ -17,12 +17,13 @@ Trello board: [Click me!](https://trello.com/b/6zWLE6Jm)
 ## Database Types
 - MariaDB
 - MySQL
-- MS-SQL (far future)
+- MS-SQL
 
 | Database Type | Config Type |
 |---------------|-------------|
 | MariaDB       | mariadb     |
  | MySQL         | mysql       |
+ | MS-SQL        | mssql       |
 
 
 ## Storage types
