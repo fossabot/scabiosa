@@ -21,8 +21,8 @@ func main() {
 		},
 		Copyright: "(c) 2021-2022 netbenix",
 		Commands: []*cli.Command{
-			Commands.StartBackupProc(),
-			Commands.GenerateNewConfigs(),
+			Commands.StartBackupProcCommand(),
+			Commands.GenerateNewConfigsCommand(),
 		},
 	}
 

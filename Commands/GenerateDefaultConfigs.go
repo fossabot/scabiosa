@@ -8,7 +8,7 @@ import (
 	"scabiosa/Tools"
 )
 
-func GenerateNewConfigs() *cli.Command {
+func GenerateNewConfigsCommand() *cli.Command {
 	logger := Logging.Logger("generate-configs")
 
 	return &cli.Command{
