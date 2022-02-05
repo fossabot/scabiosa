@@ -7,8 +7,10 @@ require github.com/sirupsen/logrus v1.8.1
 require (
 	github.com/Azure/azure-storage-file-go v0.8.0
 	github.com/cheggaaa/pb/v3 v3.0.8
+	github.com/denisenkom/go-mssqldb v0.11.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/uuid v1.3.0
+	github.com/judwhite/go-svc v1.2.1
 	github.com/urfave/cli/v2 v2.3.0
 )
 
@@ -16,7 +18,6 @@ require (
 	github.com/Azure/azure-pipeline-go v0.2.1 // indirect
 	github.com/VividCortex/ewma v1.1.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d // indirect
-	github.com/denisenkom/go-mssqldb v0.11.0 // indirect
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
