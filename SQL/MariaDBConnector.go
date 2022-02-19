@@ -33,26 +33,17 @@ func GetMariaDBInstance(sqlConfig Tools.SQLConfig) MariaDBConnector {
 
 func (mariadb MariaDBConnector) checkIfEventLogTableExist(db *sql.DB) bool {
 	rows, _ := db.Query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'EventLog';", mariadb.Database)
-	if !rows.Next() {
-		return false
-	}
-	return true
+	return rows.Next()
 }
 
 func (mariadb MariaDBConnector) checkIfBackupTableExist(db *sql.DB) bool {
 	rows, _ := db.Query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'Backups';", mariadb.Database)
-	if !rows.Next() {
-		return false
-	}
-	return true
+	return rows.Next()
 }
 
 func (mariadb MariaDBConnector) checkIfBackupEntryExist(db *sql.DB, backupName string, hostname string) bool {
 	rows, _ := db.Query("SELECT * FROM `"+mariadb.Database+"`.Backups WHERE Hostname = ? AND BackupName = ?;", hostname, backupName)
-	if !rows.Next() {
-		return false
-	}
-	return true
+	return rows.Next()
 }
 
 func createMariaDBConnection(mariadb MariaDBConnector) *sql.DB {
