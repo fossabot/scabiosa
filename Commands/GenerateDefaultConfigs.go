@@ -36,14 +36,10 @@ func GenerateNewConfigsCommand() *cli.Command {
 				fmt.Scanf("%d", &inputInt)
 				switch inputInt {
 				case 0:
-					{
-						sqlConfig.SqlType = "mariadb"
-					}
+					sqlConfig.SqlType = "mariadb"
 				default:
-					{
-						fmt.Printf("Invalid input!")
-						os.Exit(1)
-					}
+					fmt.Printf("Invalid input!")
+					os.Exit(1)
 				}
 
 				fmt.Printf("\n\nSQL Address: ")
@@ -71,10 +67,9 @@ func GenerateNewConfigsCommand() *cli.Command {
 			fmt.Scanf("%d", &inputInt)
 			switch inputInt {
 			case 0:
-				{
-					fmt.Printf("Reminder: remoteStorageType = none\n")
-					//Do (nearly) nothing! :D
-				}
+				fmt.Printf("Reminder: remoteStorageType = none\n")
+				//Do (nearly) nothing! :D
+
 			case 1:
 				{
 					var azure Tools.AzureConfig
@@ -89,10 +84,8 @@ func GenerateNewConfigsCommand() *cli.Command {
 					fmt.Printf("Reminder: remoteStorageType = azure-file\n")
 				}
 			default:
-				{
-					fmt.Printf("Invalid input!")
-					os.Exit(1)
-				}
+				fmt.Printf("Invalid input!")
+				os.Exit(1)
 			}
 
 			Tools.GenerateBaseConfig()
