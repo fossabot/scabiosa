@@ -58,7 +58,7 @@ func CheckIfConfigExists() {
 	logger := Logging.DetailedLogger("ConfigHandler", "CheckIfConfigExists")
 
 	if _, err := os.Stat("config/config.json"); os.IsNotExist(err) {
-		_, fileErr := os.OpenFile("config/config.json", os.O_CREATE, 0775)
+		_, fileErr := os.OpenFile("config/config.json", os.O_CREATE, 0600)
 		if fileErr != nil {
 			logger.Fatal(fileErr)
 		}
@@ -78,7 +78,7 @@ func GenerateBaseConfig() {
 	for _, s := range baseConfig.FolderToBackup {
 		s.BackupName = ""
 	}
-	err = os.WriteFile("config/config.json", conf, 0775)
+	err = os.WriteFile("config/config.json", conf, 0600)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -107,7 +107,7 @@ func GenerateSQLConfig(sqlConfig SQLConfig) {
 		logger.Fatal(err)
 	}
 
-	err = os.WriteFile("config/sql-config.json", conf, 0775)
+	err = os.WriteFile("config/sql-config.json", conf, 0600)
 	if err != nil {
 		logger.Fatal(err)
 	}
