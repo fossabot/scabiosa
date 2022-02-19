@@ -78,6 +78,7 @@ func getTimeSuffix() string {
 	return "_" + currTime.Format("02-01-2006_15-04")
 }
 
+// skipcq: RVV-A0005
 func checkTmpPath(createLocalBackup bool, targetPath string) string {
 	logger := Logging.DetailedLogger("mainThread", "checkTmpPath")
 	if !createLocalBackup {
