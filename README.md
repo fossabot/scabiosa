@@ -2,7 +2,7 @@
 
 Please keep in mind that this project is WIP.
 
-Trello board: [Click me!](https://trello.com/b/6zWLE6Jm)
+YouTrack Issues & Agile Board: [Click me!](https://codenoodles.youtrack.cloud/issues)
 
 ## What can it do?
 - Backup you stuff via a dynamic configuration
