@@ -18,7 +18,7 @@ func GenerateNewConfigsCommand() *cli.Command {
 		HelpName:    "generate-config",
 		Action: func(c *cli.Context) error {
 			err := os.RemoveAll("config/")
-			os.Mkdir("config", 0755)
+			os.Mkdir("config", 0600)
 
 			if err != nil {
 				return err
