@@ -32,7 +32,7 @@ func GetMSSQLInstance(sqlConfig Tools.SQLConfig) MSSQLConnector {
 	return mssql
 }
 
-func (mssql MSSQLConnector) checkIfEventLogTableExist(db *sql.DB) bool {
+func (MSSQLConnector) checkIfEventLogTableExist(db *sql.DB) bool {
 	rows, _ := db.Query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'EventLog';")
 	if !rows.Next() {
 		return false
@@ -40,7 +40,7 @@ func (mssql MSSQLConnector) checkIfEventLogTableExist(db *sql.DB) bool {
 	return true
 }
 
-func (mssql MSSQLConnector) checkIfBackupTableExist(db *sql.DB) bool {
+func (MSSQLConnector) checkIfBackupTableExist(db *sql.DB) bool {
 	rows, _ := db.Query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Backups';")
 	if !rows.Next() {
 		return false
@@ -48,7 +48,7 @@ func (mssql MSSQLConnector) checkIfBackupTableExist(db *sql.DB) bool {
 	return true
 }
 
-func (mssql MSSQLConnector) checkIfBackupEntryExist(db *sql.DB, backupName string, hostname string) bool {
+func (MSSQLConnector) checkIfBackupEntryExist(db *sql.DB, backupName string, hostname string) bool {
 	query := fmt.Sprintf("SELECT * FROM dbo.Backups WHERE Hostname = '%s' AND BackupName = '%s'", hostname, backupName)
 	rows, _ := db.Query(query)
 	if !rows.Next() {
