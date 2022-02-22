@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func CreateBakFile(fileName string, folderPath string, destinationPath string, backupName string) string {
+func CreateBakFile(fileName, folderPath, destinationPath, backupName string) string {
 	logger := Logging.DetailedLogger("Compression", "CreateBakFile")
 
 	pathToFile := destinationPath + string(os.PathSeparator) + fileName + ".bak"
@@ -30,7 +30,7 @@ func CreateBakFile(fileName string, folderPath string, destinationPath string, b
 	return pathToFile
 }
 
-func compress(fileToWrite *os.File, folderPath string, backupName string) {
+func compress(fileToWrite *os.File, folderPath, backupName string) {
 	logger := Logging.DetailedLogger("Gzip", "compress")
 
 	zr, _ := gzip.NewWriterLevel(fileToWrite, flate.BestCompression)
