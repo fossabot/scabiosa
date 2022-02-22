@@ -38,7 +38,7 @@ func compress(fileToWrite *os.File, folderPath string, backupName string) {
 
 	go fmt.Printf("[%s] Start compression...\n", backupName)
 	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Compress, SQL.REMOTE_NONE, "Start compression", time.Now())
-	// skippcq: SCC-SA4009
+	// skipcq: SCC-SA4009
 	filepath.Walk(folderPath, func(file string, fi os.FileInfo, err error) error {
 		header, err := tar.FileInfoHeader(fi, file)
 		if err != nil {
