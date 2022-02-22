@@ -23,7 +23,7 @@ type AzureFileStorage struct {
 	StorageAccountKey  string
 }
 
-func (azure AzureFileStorage) upload(fileName string, backupName string, destinationPath string) {
+func (azure AzureFileStorage) upload(fileName, backupName, destinationPath string) {
 	logger := Logging.DetailedLogger("AzureFileStorage", "upload")
 
 	file, err := os.Open(fileName)
