@@ -48,7 +48,7 @@ func (azure AzureFileStorage) upload(fileName string, backupName string, destina
 
 	ctx := context.Background()
 
-	fmt.Printf("[%s] Starting upload to Azure File Share...\n", backupName, ".bak")
+	fmt.Printf("[%s] Starting upload to Azure File Share...\n", backupName)
 	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Upload, SQL.REMOTE_AZURE_FILE, "Starting upload.", time.Now())
 
 	progressBar := pb.StartNew(int(fileSize.Size()))
