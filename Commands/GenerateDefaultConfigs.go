@@ -32,11 +32,17 @@ func GenerateNewConfigsCommand() *cli.Command {
 				sqlConfig.EnableSQL = true
 				fmt.Printf("What SQL Type do you want to use?\n")
 				fmt.Printf("[0] MariaDB\n")
+				fmt.Printf("[1] MySQL\n")
+				fmt.Printf("[2] MS-SQL\n")
 				fmt.Printf("\nSelection: ")
 				fmt.Scanf("%d", &inputInt)
 				switch inputInt {
 				case 0:
 					sqlConfig.SqlType = "mariadb"
+				case 1:
+					sqlConfig.SqlType = "mysql"
+				case 2:
+					sqlConfig.SqlType = "mssql"
 				default:
 					fmt.Printf("Invalid input!")
 					os.Exit(1)
