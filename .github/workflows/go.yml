@@ -14,8 +14,8 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: 1.17
-    - name: Build
-      run: go build
+    - name: Build Artifacts
+      run: make all
 
     - name: Bump version and push tag
       id: tag_version
@@ -35,4 +35,7 @@ jobs:
         draft: false
         prerelease: false
         files: |
-          scabiosa
+          scabiosa \
+          scabiosa-x86 \ 
+          scabiosa-Win32.exe \ 
+          scabiosa-Win64.exe
