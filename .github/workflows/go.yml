@@ -35,7 +35,7 @@ jobs:
         draft: false
         prerelease: false
         files: |
-          scabiosa \
-          scabiosa-x86 \ 
-          scabiosa-Win32.exe \ 
+          scabiosa 
+          scabiosa-x86 
+          scabiosa-Win32.exe 
           scabiosa-Win64.exe
