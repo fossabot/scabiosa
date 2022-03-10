@@ -10,7 +10,6 @@ require (
 	github.com/denisenkom/go-mssqldb v0.11.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/uuid v1.3.0
-	github.com/judwhite/go-svc v1.2.1
 	github.com/urfave/cli/v2 v2.3.0
 )
 
