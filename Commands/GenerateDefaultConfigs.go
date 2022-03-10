@@ -18,7 +18,7 @@ func GenerateNewConfigsCommand() *cli.Command {
 		HelpName:    "generate-config",
 		Action: func(c *cli.Context) error {
 			err := os.RemoveAll("config/")
-			os.Mkdir("config", 0600)
+			os.Mkdir("config", 0700)
 
 			if err != nil {
 				return err
@@ -77,18 +77,17 @@ func GenerateNewConfigsCommand() *cli.Command {
 				//Do (nearly) nothing! :D
 
 			case 1:
-				{
-					var azure Tools.AzureConfig
-					fmt.Printf("\n\nStorageAccount Name: ")
-					fmt.Scanf("%s", &azure.StorageAccountName)
-					fmt.Printf("\nStorageAccount Key: ")
-					fmt.Scanf("%s", &azure.StorageAccountKey)
-					fmt.Printf("\nFileshare Name: ")
-					fmt.Scanf("%s", &azure.FileshareName)
-					Tools.GenerateAzureConfig(azure)
-					fmt.Printf("\nAzure config created!\n")
-					fmt.Printf("Reminder: remoteStorageType = azure-file\n")
-				}
+				var azure Tools.AzureConfig
+				fmt.Printf("\n\nStorageAccount Name: ")
+				fmt.Scanf("%s", &azure.StorageAccountName)
+				fmt.Printf("\nStorageAccount Key: ")
+				fmt.Scanf("%s", &azure.StorageAccountKey)
+				fmt.Printf("\nFileshare Name: ")
+				fmt.Scanf("%s", &azure.FileshareName)
+				Tools.GenerateAzureConfig(azure)
+				fmt.Printf("\nAzure config created!\n")
+				fmt.Printf("Reminder: remoteStorageType = azure-file\n")
+
 			default:
 				fmt.Printf("Invalid input!")
 				os.Exit(1)

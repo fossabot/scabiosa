@@ -93,7 +93,7 @@ func GenerateAzureConfig(azure AzureConfig) {
 		logger.Fatal(err)
 	}
 
-	err = os.WriteFile("config/azure.json", conf, 0775)
+	err = os.WriteFile("config/azure.json", conf, 0600)
 	if err != nil {
 		logger.Fatal(err)
 	}
