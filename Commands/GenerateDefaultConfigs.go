@@ -27,7 +27,7 @@ func GenerateNewConfigsCommand() *cli.Command {
 			var input string
 			var inputInt uint8
 			fmt.Printf("Want to use SQL? [Y]/[N]: ")
-			fmt.Scanf("%s", &input)
+			fmt.Scanf("%s\n", &input)
 			if input[0] == 'Y' || input[0] == 'y' {
 				sqlConfig.EnableSQL = true
 				fmt.Printf("What SQL Type do you want to use?\n")
@@ -35,7 +35,7 @@ func GenerateNewConfigsCommand() *cli.Command {
 				fmt.Printf("[1] MySQL\n")
 				fmt.Printf("[2] MS-SQL\n")
 				fmt.Printf("\nSelection: ")
-				fmt.Scanf("%d", &inputInt)
+				fmt.Scanf("%d\n", &inputInt)
 				switch inputInt {
 				case 0:
 					sqlConfig.SqlType = "mariadb"
@@ -49,15 +49,15 @@ func GenerateNewConfigsCommand() *cli.Command {
 				}
 
 				fmt.Printf("\n\nSQL Address: ")
-				fmt.Scanf("%s", &sqlConfig.SqlAddress)
+				fmt.Scanf("%s\n", &sqlConfig.SqlAddress)
 				fmt.Printf("\nSQL Port: ")
-				fmt.Scanf("%d", &sqlConfig.SqlPort)
+				fmt.Scanf("%d\n", &sqlConfig.SqlPort)
 				fmt.Printf("\nSQL Database: ")
-				fmt.Scanf("%s", &sqlConfig.Database)
+				fmt.Scanf("%s\n", &sqlConfig.Database)
 				fmt.Printf("\nSQL User: ")
-				fmt.Scanf("%s", &sqlConfig.DbUser)
+				fmt.Scanf("%s\n", &sqlConfig.DbUser)
 				fmt.Printf("\nSQL Password: ")
-				fmt.Scanf("%s", &sqlConfig.DbPassword)
+				fmt.Scanf("%s\n", &sqlConfig.DbPassword)
 
 				Tools.GenerateSQLConfig(sqlConfig)
 				fmt.Printf("SQL config created!")
@@ -70,7 +70,7 @@ func GenerateNewConfigsCommand() *cli.Command {
 			fmt.Printf("[0]\tNone\n")
 			fmt.Printf("[1]\tAzure File Share\n")
 			fmt.Printf("\nSelection: ")
-			fmt.Scanf("%d", &inputInt)
+			fmt.Scanf("%d\n", &inputInt)
 			switch inputInt {
 			case 0:
 				fmt.Printf("Reminder: remoteStorageType = none\n")
@@ -79,11 +79,11 @@ func GenerateNewConfigsCommand() *cli.Command {
 			case 1:
 				var azure Tools.AzureConfig
 				fmt.Printf("\n\nStorageAccount Name: ")
-				fmt.Scanf("%s", &azure.StorageAccountName)
+				fmt.Scanf("%s\n", &azure.StorageAccountName)
 				fmt.Printf("\nStorageAccount Key: ")
-				fmt.Scanf("%s", &azure.StorageAccountKey)
+				fmt.Scanf("%s\n", &azure.StorageAccountKey)
 				fmt.Printf("\nFileshare Name: ")
-				fmt.Scanf("%s", &azure.FileshareName)
+				fmt.Scanf("%s\n", &azure.FileshareName)
 				Tools.GenerateAzureConfig(azure)
 				fmt.Printf("\nAzure config created!\n")
 				fmt.Printf("Reminder: remoteStorageType = azure-file\n")
