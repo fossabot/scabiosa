@@ -4,7 +4,12 @@
 *.dll
 *.so
 *.dylib
+
+# Executeables
+scabiosa-x86
 scabiosa
+scabiosa-Win32.exe
+scaboisa-Win64.exe
 
 # Test binary, built with `go test -c`
 *.test
