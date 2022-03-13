@@ -86,7 +86,7 @@ func (mariadb MariaDBConnector) newLogEntry(uuid uuid.UUID, logType LogType, bac
 
 	hostname, _ := os.Hostname()
 
-	_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.EventLog VALUES (?, ?, ?, ?, ?, ?, ?, ?);", uuid.String(), strconv.FormatInt(int64(logType), 10), hostname, backupName, stage, strconv.FormatInt(int64(storageType), 10), description, timestamp)
+	_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.EventLog VALUES (?, ?, ?, ?, ?, ?, ?, ?);", uuid.String(), logType.String(), hostname, backupName, stage, strconv.FormatInt(int64(storageType), 10), description, timestamp)
 	if err != nil {
 		logger.Fatal(err)
 	}
