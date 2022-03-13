@@ -99,7 +99,7 @@ func GenerateAzureConfig(azure AzureConfig) {
 	}
 }
 
-func GenerateSQLConfig(sqlConfig SQLConfig) {
+func GenerateSQLConfig(sqlConfig *SQLConfig) {
 	logger := Logging.BasicLog
 
 	conf, err := json.MarshalIndent(sqlConfig, "", "\t")

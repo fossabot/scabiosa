@@ -20,7 +20,7 @@ type MSSQLConnector struct {
 	DbPassword string
 }
 
-func GetMSSQLInstance(sqlConfig Tools.SQLConfig) MSSQLConnector {
+func GetMSSQLInstance(sqlConfig *Tools.SQLConfig) MSSQLConnector {
 	var mssql MSSQLConnector
 
 	mssql.Address = sqlConfig.SqlAddress

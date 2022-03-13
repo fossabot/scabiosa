@@ -42,11 +42,11 @@ func GetSQLInstance() SQLService {
 
 	switch sqlConfig.SqlType {
 	case "mariadb":
-		return GetMariaDBInstance(sqlConfig)
+		return GetMariaDBInstance(&sqlConfig)
 	case "mysql":
-		return GetMariaDBInstance(sqlConfig)
+		return GetMariaDBInstance(&sqlConfig)
 	case "mssql":
-		return GetMSSQLInstance(sqlConfig)
+		return GetMSSQLInstance(&sqlConfig)
 	}
 
 	return nil

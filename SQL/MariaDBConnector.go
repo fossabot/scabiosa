@@ -19,7 +19,7 @@ type MariaDBConnector struct {
 	DbPassword string
 }
 
-func GetMariaDBInstance(sqlConfig Tools.SQLConfig) MariaDBConnector {
+func GetMariaDBInstance(sqlConfig *Tools.SQLConfig) MariaDBConnector {
 	var mariadb MariaDBConnector
 
 	mariadb.Address = sqlConfig.SqlAddress

@@ -66,7 +66,7 @@ func GenerateNewConfigsCommand() *cli.Command {
 				fmt.Printf("\nSQL Password: ")
 				fmt.Scanf("%s\n", &sqlConfig.DbPassword)
 
-				Tools.GenerateSQLConfig(sqlConfig)
+				Tools.GenerateSQLConfig(&sqlConfig)
 				logger.Info("SQL config created!")
 
 			} else {
