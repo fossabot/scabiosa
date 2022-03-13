@@ -42,7 +42,7 @@ func (MSSQLConnector) checkIfBackupTableExist(db *sql.DB) bool {
 	return rows.Next()
 }
 
-func (MSSQLConnector) checkIfBackupEntryExist(db *sql.DB, backupName string, hostname string) bool {
+func (MSSQLConnector) checkIfBackupEntryExist(db *sql.DB, backupName, hostname string) bool {
 	query := fmt.Sprintf("SELECT * FROM dbo.Backups WHERE Hostname = '%s' AND BackupName = '%s'", hostname, backupName)
 	rows, _ := db.Query(query)
 	return rows.Next()
@@ -109,7 +109,7 @@ func (mssql MSSQLConnector) newLogEntry(uuid uuid.UUID, logType LogType, backupN
 		logger.Fatal(err)
 	}
 }
-func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string, localPath string) {
+func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath, localPath string) {
 	logger := Logging.BasicLog
 	db := createMSSQLConnection(mssql)
 

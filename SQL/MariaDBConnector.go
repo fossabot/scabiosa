@@ -41,7 +41,7 @@ func (mariadb MariaDBConnector) checkIfBackupTableExist(db *sql.DB) bool {
 	return rows.Next()
 }
 
-func (mariadb MariaDBConnector) checkIfBackupEntryExist(db *sql.DB, backupName string, hostname string) bool {
+func (mariadb MariaDBConnector) checkIfBackupEntryExist(db *sql.DB, backupName, hostname string) bool {
 	rows, _ := db.Query("SELECT * FROM `"+mariadb.Database+"`.Backups WHERE Hostname = ? AND BackupName = ?;", hostname, backupName)
 	return rows.Next()
 }
@@ -93,7 +93,7 @@ func (mariadb MariaDBConnector) newLogEntry(uuid uuid.UUID, logType LogType, bac
 
 }
 
-func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string, localPath string) {
+func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath, localPath string) {
 	logger := Logging.BasicLog
 	db := createMariaDBConnection(mariadb)
 
