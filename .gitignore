@@ -11,6 +11,9 @@ scabiosa
 scabiosa-Win32.exe
 scaboisa-Win64.exe
 
+# Log Files
+*.log
+
 # Test binary, built with `go test -c`
 *.test
 
