@@ -9,7 +9,7 @@ import (
 )
 
 func GenerateNewConfigsCommand() *cli.Command {
-	logger := Logging.Logger("generate-configs")
+	logger := Logging.BasicLog
 
 	return &cli.Command{
 		Name:        "generate-config",
@@ -17,12 +17,19 @@ func GenerateNewConfigsCommand() *cli.Command {
 		Description: "Creates the specified configs",
 		HelpName:    "generate-config",
 		Action: func(c *cli.Context) error {
+			logger.Info("Entering configuration assistant...")
 			err := os.RemoveAll("config/")
-			os.Mkdir("config", 0700)
-
 			if err != nil {
-				return err
+				logger.Fatal(err)
 			}
+			logger.Info("Deleted config folder.")
+
+			dirCreateErr := os.Mkdir("config", 0700)
+			if dirCreateErr != nil {
+				logger.Fatal(err)
+			}
+			logger.Info("Created config folder.")
+
 			var sqlConfig Tools.SQLConfig
 			var input string
 			var inputInt uint8
@@ -60,7 +67,7 @@ func GenerateNewConfigsCommand() *cli.Command {
 				fmt.Scanf("%s\n", &sqlConfig.DbPassword)
 
 				Tools.GenerateSQLConfig(sqlConfig)
-				fmt.Printf("SQL config created!")
+				logger.Info("SQL config created!")
 
 			} else {
 				sqlConfig.EnableSQL = false
@@ -94,8 +101,8 @@ func GenerateNewConfigsCommand() *cli.Command {
 			}
 
 			Tools.GenerateBaseConfig()
-			fmt.Printf("All configs generated!\n")
-			fmt.Printf("Please modify the config.json with your backup entries.\n")
+			logger.Info("All configs generated!")
+			logger.Info("Please modify the config.json with your backup entries.")
 
 			return nil
 		},

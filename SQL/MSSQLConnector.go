@@ -49,7 +49,7 @@ func (MSSQLConnector) checkIfBackupEntryExist(db *sql.DB, backupName string, hos
 }
 
 func createMSSQLConnection(mssql MSSQLConnector) *sql.DB {
-	logger := Logging.DetailedLogger("MS-SQL", "createConnection")
+	logger := Logging.BasicLog
 
 	query := url.Values{}
 	query.Add("app name", "scabiosa")
@@ -75,7 +75,7 @@ func createMSSQLConnection(mssql MSSQLConnector) *sql.DB {
 }
 
 func (mssql MSSQLConnector) createDefaultTables() {
-	logger := Logging.DetailedLogger("MS-SQL", "createDefaultTables")
+	logger := Logging.BasicLog
 
 	eventLogSQL := "create table dbo.EventLog(UUID text null, LogType VARCHAR(20) NOT NULL CHECK (LogType IN('INFO', 'WARNING', 'ERROR', 'FATAL')), Hostname varchar(256) null, BackupName varchar(256) null, Stage VARCHAR(20) NOT NULL CHECK (Stage IN('COMPRESS', 'UPLOAD', 'DELETE TMP')), RemoteStorage VARCHAR(20) NOT NULL CHECK (RemoteStorage IN('AZURE-FILE', 'AZURE-BLOB', 'NONE')), Description text null, Timestamp datetime null);"
 	backupSQL := "create table dbo.Backups(UUID text null, Hostname varchar(256) null, BackupName varchar(256) null, LastBackup datetime null, LocalBackup tinyint null, FilePath varchar(256) null, RemoteStorage VARCHAR(20) NOT NULL CHECK (RemoteStorage IN('AZURE-FILE', 'AZURE-BLOB', 'NONE')), RemotePath varchar(256) null, LocalPath varchar(256) null);"
@@ -99,7 +99,7 @@ func (mssql MSSQLConnector) createDefaultTables() {
 	_ = db.Close()
 }
 func (mssql MSSQLConnector) newLogEntry(uuid uuid.UUID, logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, description string, timestamp time.Time) {
-	logger := Logging.DetailedLogger("MS-SQL", "newLogEntry")
+	logger := Logging.BasicLog
 	db := createMSSQLConnection(mssql)
 
 	hostname, _ := os.Hostname()
@@ -110,7 +110,7 @@ func (mssql MSSQLConnector) newLogEntry(uuid uuid.UUID, logType LogType, backupN
 	}
 }
 func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string, localPath string) {
-	logger := Logging.DetailedLogger("MS-SQL", "newBackupEntry")
+	logger := Logging.BasicLog
 	db := createMSSQLConnection(mssql)
 
 	hostname, _ := os.Hostname()

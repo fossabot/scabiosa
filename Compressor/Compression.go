@@ -15,7 +15,7 @@ import (
 )
 
 func CreateBakFile(fileName, folderPath, destinationPath, backupName string) string {
-	logger := Logging.DetailedLogger("Compression", "CreateBakFile")
+	logger := Logging.BasicLog
 
 	pathToFile := destinationPath + string(os.PathSeparator) + fileName + ".bak"
 
@@ -31,7 +31,7 @@ func CreateBakFile(fileName, folderPath, destinationPath, backupName string) str
 }
 
 func compress(fileToWrite *os.File, folderPath, backupName string) {
-	logger := Logging.DetailedLogger("Gzip", "compress")
+	logger := Logging.BasicLog
 
 	zr, _ := gzip.NewWriterLevel(fileToWrite, flate.BestCompression)
 	tw := tar.NewWriter(zr)
