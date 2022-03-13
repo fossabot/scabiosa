@@ -19,7 +19,7 @@ type MariaDBConnector struct {
 	DbPassword string
 }
 
-func GetMariaDBInstance(sqlConfig Tools.SQLConfig) MariaDBConnector {
+func GetMariaDBInstance(sqlConfig *Tools.SQLConfig) MariaDBConnector {
 	var mariadb MariaDBConnector
 
 	mariadb.Address = sqlConfig.SqlAddress
@@ -41,13 +41,13 @@ func (mariadb MariaDBConnector) checkIfBackupTableExist(db *sql.DB) bool {
 	return rows.Next()
 }
 
-func (mariadb MariaDBConnector) checkIfBackupEntryExist(db *sql.DB, backupName string, hostname string) bool {
+func (mariadb MariaDBConnector) checkIfBackupEntryExist(db *sql.DB, backupName, hostname string) bool {
 	rows, _ := db.Query("SELECT * FROM `"+mariadb.Database+"`.Backups WHERE Hostname = ? AND BackupName = ?;", hostname, backupName)
 	return rows.Next()
 }
 
 func createMariaDBConnection(mariadb MariaDBConnector) *sql.DB {
-	logger := Logging.DetailedLogger("MariaDB", "createConnection")
+	logger := Logging.BasicLog
 	db, err := sql.Open("mysql", mariadb.DbUser+":"+mariadb.DbPassword+"@("+mariadb.Address+":"+strconv.Itoa(int(mariadb.Port))+")/"+mariadb.Database)
 	if err != nil {
 		logger.Fatal(err)
@@ -56,7 +56,7 @@ func createMariaDBConnection(mariadb MariaDBConnector) *sql.DB {
 }
 
 func (mariadb MariaDBConnector) createDefaultTables() {
-	logger := Logging.DetailedLogger("MariaDB", "createDefaultTables")
+	logger := Logging.BasicLog
 
 	eventLogSQL := "create table `" + mariadb.Database + "`.EventLog(UUID text null, LogType enum ('INFO', 'WARNING', 'ERROR', 'FATAL') null, Hostname varchar(256) null,BackupName varchar(256) null, Stage enum ('COMPRESS', 'UPLOAD', 'DELETE TMP')  null, RemoteStorage enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE') null, Description text null, Timestamp datetime null);"
 	backupSQL := "create table `" + mariadb.Database + "`.Backups(UUID text null, Hostname varchar(256) null, BackupName varchar(256) null, LastBackup datetime null, LocalBackup tinyint(1) null, FilePath varchar(256) null, RemoteStorage enum ('AZURE-FILE', 'AZURE-BLOB', 'NONE') null, RemotePath varchar(256) null, LocalPath varchar(256) null);"
@@ -81,7 +81,7 @@ func (mariadb MariaDBConnector) createDefaultTables() {
 }
 
 func (mariadb MariaDBConnector) newLogEntry(uuid uuid.UUID, logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, description string, timestamp time.Time) {
-	logger := Logging.DetailedLogger("MariaDB", "newLogEntry")
+	logger := Logging.BasicLog
 	db := createMariaDBConnection(mariadb)
 
 	hostname, _ := os.Hostname()
@@ -93,8 +93,8 @@ func (mariadb MariaDBConnector) newLogEntry(uuid uuid.UUID, logType LogType, bac
 
 }
 
-func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath string, localPath string) {
-	logger := Logging.DetailedLogger("MariaDB", "newBackupEntry")
+func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath, localPath string) {
+	logger := Logging.BasicLog
 	db := createMariaDBConnection(mariadb)
 
 	hostname, _ := os.Hostname()

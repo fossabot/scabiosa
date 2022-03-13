@@ -8,7 +8,9 @@ import (
 )
 
 func main() {
-	logger := Logging.Logger("mainThread")
+	logger := Logging.BasicLog
+
+	logger.Init()
 
 	app := &cli.App{
 		Name:  "scabiosa",
@@ -31,4 +33,5 @@ func main() {
 		logger.Fatal(err)
 	}
 
+	logger.Info("Finished. Exiting...")
 }

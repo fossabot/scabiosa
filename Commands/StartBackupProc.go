@@ -1,6 +1,7 @@
 package Commands
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/urfave/cli/v2"
 	"os"
@@ -13,7 +14,7 @@ import (
 )
 
 func StartBackupProcCommand() *cli.Command {
-	logger := Logging.Logger("backup")
+	logger := Logging.BasicLog
 
 	return &cli.Command{
 		Name:        "backup",
@@ -36,11 +37,15 @@ func StartBackupProcCommand() *cli.Command {
 func StartBackupProc() {
 	Tools.CheckIfConfigExists()
 	config := Tools.GetConfig()
+	logger := Logging.BasicLog
 
+	logger.Info("Entering backup util...")
+
+	logger.Info("Creating SQL Tables if not existing")
 	SQL.CreateDefaultTables(SQL.GetSQLInstance())
 
 	for _, backupItem := range config.FolderToBackup {
-
+		logger.Info(fmt.Sprintf("Starting backup for %s", backupItem.BackupName))
 		var storage StorageTypes.Storage
 		var destPath string
 
@@ -69,6 +74,7 @@ func StartBackupProc() {
 			backupItem.RemoteTargetPath = "NONE"
 		}
 		SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), backupItem.CreateLocalBackup, backupItem.FolderPath, StorageTypes.CheckRemoteStorageType(backupItem.RemoteStorageType), backupItem.RemoteTargetPath, backupItem.LocalTargetPath)
+		logger.Info(fmt.Sprintf("Finished backup for %s", backupItem.BackupName))
 	}
 }
 
@@ -80,7 +86,7 @@ func getTimeSuffix() string {
 
 // skipcq: RVV-A0005
 func checkTmpPath(createLocalBackup bool, targetPath string) string {
-	logger := Logging.DetailedLogger("mainThread", "checkTmpPath")
+	logger := Logging.BasicLog
 	if !createLocalBackup {
 		if _, err := os.Stat("tmp"); os.IsNotExist(err) {
 			dirErr := os.Mkdir("tmp", 0600)
@@ -88,6 +94,7 @@ func checkTmpPath(createLocalBackup bool, targetPath string) string {
 				logger.Fatal(err)
 			}
 		}
+		logger.Info("tmp folder successfully created.")
 		return "tmp"
 	}
 

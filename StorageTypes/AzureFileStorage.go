@@ -24,7 +24,7 @@ type AzureFileStorage struct {
 }
 
 func (azure AzureFileStorage) upload(fileName, backupName, destinationPath string) {
-	logger := Logging.DetailedLogger("AzureFileStorage", "upload")
+	logger := Logging.BasicLog
 
 	file, err := os.Open(fileName)
 	if err != nil {
@@ -48,7 +48,7 @@ func (azure AzureFileStorage) upload(fileName, backupName, destinationPath strin
 
 	ctx := context.Background()
 
-	fmt.Printf("[%s] Starting upload to Azure File Share...\n", backupName)
+	logger.Info(fmt.Sprintf("[%s] Starting upload to Azure File Share...\n", backupName))
 	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Upload, SQL.REMOTE_AZURE_FILE, "Starting upload.", time.Now())
 
 	progressBar := pb.StartNew(int(fileSize.Size()))
@@ -68,12 +68,12 @@ func (azure AzureFileStorage) upload(fileName, backupName, destinationPath strin
 		logger.Fatal(err)
 	}
 	progressBar.Finish()
-	fmt.Printf("[%s] Upload finished.\n", strings.Trim(backupName, ".bak"))
+	logger.Info(fmt.Sprintf("[%s] Upload finished.\n", strings.Trim(backupName, ".bak")))
 	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Upload, SQL.REMOTE_AZURE_FILE, "Finished upload.", time.Now())
 }
 
 func readConfig() []byte {
-	logger := Logging.DetailedLogger("AzureFileStorage", "readConfig")
+	logger := Logging.BasicLog
 
 	file, err := os.ReadFile("config/azure.json")
 	if err != nil {
@@ -84,7 +84,7 @@ func readConfig() []byte {
 }
 
 func GetAzureStorage() AzureFileStorage {
-	logger := Logging.DetailedLogger("AzureFileStorage", "GetAzureStorage")
+	logger := Logging.BasicLog
 
 	var azureConfig Tools.AzureConfig
 	var azureFileShare AzureFileStorage

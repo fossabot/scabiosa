@@ -35,7 +35,7 @@ type Config struct {
 }
 
 func readConfig() []byte {
-	logger := Logging.DetailedLogger("ConfigHandler", "readConfig")
+	logger := Logging.BasicLog
 
 	file, err := os.ReadFile("config/config.json")
 	if err != nil {
@@ -45,7 +45,7 @@ func readConfig() []byte {
 }
 
 func readSQLConfig() []byte {
-	logger := Logging.DetailedLogger("ConfigHandler", "readSQLConfig")
+	logger := Logging.BasicLog
 
 	file, err := os.ReadFile("config/sql-config.json")
 	if err != nil {
@@ -55,7 +55,7 @@ func readSQLConfig() []byte {
 }
 
 func CheckIfConfigExists() {
-	logger := Logging.DetailedLogger("ConfigHandler", "CheckIfConfigExists")
+	logger := Logging.BasicLog
 
 	if _, err := os.Stat("config/config.json"); os.IsNotExist(err) {
 		_, fileErr := os.OpenFile("config/config.json", os.O_CREATE, 0600)
@@ -68,7 +68,7 @@ func CheckIfConfigExists() {
 }
 
 func GenerateBaseConfig() {
-	logger := Logging.DetailedLogger("ConfigHandler", "GenerateBaseConfig")
+	logger := Logging.BasicLog
 	var baseConfig Config
 
 	conf, err := json.MarshalIndent(baseConfig, "", "\t")
@@ -86,7 +86,7 @@ func GenerateBaseConfig() {
 }
 
 func GenerateAzureConfig(azure AzureConfig) {
-	logger := Logging.DetailedLogger("ConfigHandler", "GenerateAzureConfig")
+	logger := Logging.BasicLog
 
 	conf, err := json.MarshalIndent(azure, "", "\t")
 	if err != nil {
@@ -99,8 +99,8 @@ func GenerateAzureConfig(azure AzureConfig) {
 	}
 }
 
-func GenerateSQLConfig(sqlConfig SQLConfig) {
-	logger := Logging.DetailedLogger("ConfigHandler", "GenerateSQLConfig")
+func GenerateSQLConfig(sqlConfig *SQLConfig) {
+	logger := Logging.BasicLog
 
 	conf, err := json.MarshalIndent(sqlConfig, "", "\t")
 	if err != nil {
@@ -115,7 +115,7 @@ func GenerateSQLConfig(sqlConfig SQLConfig) {
 }
 
 func GetSQLConfig() SQLConfig {
-	logger := Logging.DetailedLogger("ConfigHandler", "GetSQLConfig")
+	logger := Logging.BasicLog
 	var sqlConfig SQLConfig
 
 	err := json.Unmarshal(readSQLConfig(), &sqlConfig)
@@ -128,7 +128,7 @@ func GetSQLConfig() SQLConfig {
 
 func GetConfig() Config {
 
-	logger := Logging.DetailedLogger("ConfigHandler", "GetConfig")
+	logger := Logging.BasicLog
 	var config Config
 
 	err := json.Unmarshal(readConfig(), &config)

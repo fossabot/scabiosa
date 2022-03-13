@@ -4,7 +4,6 @@ import (
 	"archive/tar"
 	"compress/flate"
 	"compress/gzip"
-	"fmt"
 	"github.com/google/uuid"
 	"io"
 	"os"
@@ -15,7 +14,7 @@ import (
 )
 
 func CreateBakFile(fileName, folderPath, destinationPath, backupName string) string {
-	logger := Logging.DetailedLogger("Compression", "CreateBakFile")
+	logger := Logging.BasicLog
 
 	pathToFile := destinationPath + string(os.PathSeparator) + fileName + ".bak"
 
@@ -31,12 +30,11 @@ func CreateBakFile(fileName, folderPath, destinationPath, backupName string) str
 }
 
 func compress(fileToWrite *os.File, folderPath, backupName string) {
-	logger := Logging.DetailedLogger("Gzip", "compress")
+	logger := Logging.BasicLog
 
 	zr, _ := gzip.NewWriterLevel(fileToWrite, flate.BestCompression)
 	tw := tar.NewWriter(zr)
 
-	go fmt.Printf("[%s] Start compression...\n", backupName)
 	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Compress, SQL.REMOTE_NONE, "Start compression", time.Now())
 	// skipcq: SCC-SA4009
 	filepath.Walk(folderPath, func(file string, fi os.FileInfo, err error) error {
@@ -57,8 +55,7 @@ func compress(fileToWrite *os.File, folderPath, backupName string) {
 			if err != nil {
 				logger.Fatal(err)
 			}
-
-			go fmt.Printf("[%s] Compressing: %s (%d bytes)\n", backupName, relPath, fi.Size())
+			
 			if _, err := io.Copy(tw, data); err != nil {
 				logger.Fatal(err)
 			}
@@ -75,6 +72,5 @@ func compress(fileToWrite *os.File, folderPath, backupName string) {
 		logger.Fatal(err)
 	}
 
-	go fmt.Printf("[%s] Compression Done.\n", backupName)
 	SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupName, SQL.SQLStage_Compress, SQL.REMOTE_NONE, "Compression complete.", time.Now())
 }
