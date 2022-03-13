@@ -41,6 +41,7 @@ func (*basicLogger) Init() {
 	if dirErr != nil {
 		dirCreateErr := os.Mkdir("logs", 0700)
 		if dirCreateErr != nil {
+			// skipcq: RVV-A0005
 			log.Fatal(dirCreateErr)
 		}
 	}
@@ -49,6 +50,7 @@ func (*basicLogger) Init() {
 
 	file, err := os.OpenFile("logs/"+dt.Format("02-01-2006_15-04")+".log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
+		// skipcq: RVV-A0005
 		log.Fatal(err)
 	}
 
