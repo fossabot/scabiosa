@@ -93,8 +93,8 @@ func checkTmpPath(createLocalBackup bool, targetPath string) string {
 			if dirErr != nil {
 				logger.Fatal(err)
 			}
+			logger.Info("tmp folder successfully created.")
 		}
-		logger.Info("tmp folder successfully created.")
 		return "tmp"
 	}
 
