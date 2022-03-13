@@ -16,27 +16,27 @@ var (
 	BasicLog      *basicLogger
 )
 
-func (logger *basicLogger) Info(message string) {
+func (*basicLogger) Info(message string) {
 	fmt.Printf("[INFO] %s\n", message)
 	infoLogger.Printf(message)
 }
 
-func (logger *basicLogger) Warn(message string) {
+func (*basicLogger) Warn(message string) {
 	fmt.Printf("[WARN] %s\n", message)
 	warningLogger.Printf(message)
 }
 
-func (logger *basicLogger) Error(err error) {
+func (*basicLogger) Error(err error) {
 	fmt.Printf("[ERROR] %s\n", err.Error())
 	errorLogger.Print(err)
 }
 
-func (logger *basicLogger) Fatal(err error) {
+func (*basicLogger) Fatal(err error) {
 	fmt.Printf("[ERROR] %s\n", err.Error())
 	errorLogger.Fatal(err)
 }
 
-func (logger *basicLogger) Init() {
+func (*basicLogger) Init() {
 	_, dirErr := os.Stat("logs")
 	if dirErr != nil {
 		dirCreateErr := os.Mkdir("logs", 0700)
