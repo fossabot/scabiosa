@@ -44,38 +44,26 @@ func StartBackupProc() {
 	logger.Info("Creating SQL Tables if not existing")
 	SQL.CreateDefaultTables(SQL.GetSQLInstance())
 
+	checkTmpPath()
+
 	for _, backupItem := range config.FolderToBackup {
 		logger.Info(fmt.Sprintf("Starting backup for %s", backupItem.BackupName))
-		var storage StorageTypes.Storage
 		var destPath string
-
-		if backupItem.RemoteStorageType != "none" {
-			storage = StorageTypes.CheckStorageType(backupItem.RemoteStorageType)
-			destPath = checkTmpPath(backupItem.CreateLocalBackup, backupItem.LocalTargetPath)
-		} else {
-			destPath = backupItem.LocalTargetPath
-		}
 
 		bakFile := Compressor.CreateBakFile(backupItem.BackupName+getTimeSuffix(), backupItem.FolderPath, destPath, backupItem.BackupName)
 
-		if backupItem.RemoteStorageType != "none" {
-			StorageTypes.UploadFile(storage, bakFile, backupItem.BackupName, backupItem.RemoteTargetPath)
+		for _, backupDestination := range backupItem.Destinations {
+			var storage StorageTypes.Storage
+			storage = StorageTypes.CheckStorageType(backupDestination.DestType)
+			StorageTypes.UploadFile(storage, bakFile, backupItem.BackupName, backupDestination.DestPath)
+			SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_Upload, StorageTypes.CheckRemoteStorageType(backupDestination.DestType), "Uploaded to destination", time.Now())
 		}
-
-		if !backupItem.CreateLocalBackup && backupItem.RemoteStorageType != "none" {
-			backupItem.LocalTargetPath = "NONE"
 
 			_ = os.Remove(bakFile)
 			SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_DeleteTmp, SQL.REMOTE_NONE, "Deleted tmp file", time.Now())
-		}
-
-		if backupItem.RemoteStorageType == "none" {
-			backupItem.CreateLocalBackup = true
-			backupItem.RemoteTargetPath = "NONE"
-		}
-		SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), backupItem.CreateLocalBackup, backupItem.FolderPath, StorageTypes.CheckRemoteStorageType(backupItem.RemoteStorageType), backupItem.RemoteTargetPath, backupItem.LocalTargetPath)
+		SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), false, backupItem.FolderPath, SQL.REMOTE_NONE, "NULL", "NULL")
 		logger.Info(fmt.Sprintf("Finished backup for %s", backupItem.BackupName))
-	}
+		}
 }
 
 func getTimeSuffix() string {
@@ -85,18 +73,13 @@ func getTimeSuffix() string {
 }
 
 // skipcq: RVV-A0005
-func checkTmpPath(createLocalBackup bool, targetPath string) string {
+func checkTmpPath() {
 	logger := Logging.BasicLog
-	if !createLocalBackup {
-		if _, err := os.Stat("tmp"); os.IsNotExist(err) {
-			dirErr := os.Mkdir("tmp", 0600)
-			if dirErr != nil {
-				logger.Fatal(err)
-			}
-			logger.Info("tmp folder successfully created.")
+	if _, err := os.Stat("tmp"); os.IsNotExist(err) {
+		dirErr := os.Mkdir("tmp", 0600)
+		if dirErr != nil {
+			logger.Fatal(err)
 		}
-		return "tmp"
+		logger.Info("tmp folder successfully created.")
 	}
-
-	return targetPath
 }
