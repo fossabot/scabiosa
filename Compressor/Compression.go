@@ -55,7 +55,7 @@ func compress(fileToWrite *os.File, folderPath, backupName string) {
 			if err != nil {
 				logger.Fatal(err)
 			}
-			
+
 			if _, err := io.Copy(tw, data); err != nil {
 				logger.Fatal(err)
 			}

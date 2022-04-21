@@ -98,6 +98,8 @@ func (mssql MSSQLConnector) createDefaultTables() {
 
 	_ = db.Close()
 }
+
+// skipcq: RVV-A0005
 func (mssql MSSQLConnector) newLogEntry(uuid uuid.UUID, logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, description string, timestamp time.Time) {
 	logger := Logging.BasicLog
 	db := createMSSQLConnection(mssql)

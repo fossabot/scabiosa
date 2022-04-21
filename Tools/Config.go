@@ -25,12 +25,12 @@ type AzureConfig struct {
 
 type Config struct {
 	FolderToBackup []struct {
-		BackupName        string `json:"backupName"`
-		FolderPath        string `json:"folderPath"`
-		RemoteStorageType string `json:"remoteStorageType"`
-		RemoteTargetPath  string `json:"remoteTargetPath"`
-		CreateLocalBackup bool   `json:"createLocalBackup"`
-		LocalTargetPath   string `json:"LocalTargetPath"`
+		BackupName   string `json:"backupName"`
+		FolderPath   string `json:"folderPath"`
+		Destinations []struct {
+			DestType string `json:"destType"`
+			DestPath string `json:"destPath"`
+		} `json:"destinations"`
 	} `json:"foldersToBackup"`
 }
 

@@ -44,15 +44,14 @@ YouTrack Issues & Agile Board: [Click me!](https://codenoodles.youtrack.cloud/is
 ## Config Explaination
 
 ### config.json
-| Field                 |       Type       | Description                                    |
-|-----------------------|:----------------:|------------------------------------------------|
-| **foldersToBackup**   | ---------------- | ---------------------------------------------- |
-| backupName            |      string      | .bak file name                                 |
-| folderPath            |      string      | Path to folder which should be backed up       |
-| remoteStorageType     |      string      | See [StorageTypes](#storage-types)             |
-| remoteTargetPath      |      string      | Sets the remotePath for remote backups         |
-| localTargetPath       |      string      | Sets the targetPath for local backups          |
-| createLocalBackup     |     boolean      | Sets if .bak file should also be saved locally |
+| Field               |       Type       | Description                                    |
+|---------------------|:----------------:|------------------------------------------------|
+| **foldersToBackup** | ---------------- | ---------------------------------------------- |
+| backupName          |      string      | .bak file name                                 |
+| folderPath          |      string      | Path to folder which should be backed up       |
+| -> **destinations** | ---------------- | ---------------------------------------------- |
+| destType            |      string      | See [StorageTypes](#storage-types)             | 
+| destPath            |      string      | Absolute path where backup should get stored   |
 
 ### sql-config.json
 | Field        |       Type       | Description                                    |

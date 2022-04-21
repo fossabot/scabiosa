@@ -74,13 +74,13 @@ func GenerateNewConfigsCommand() *cli.Command {
 			}
 
 			fmt.Printf("\n\nWhich storage do you want to use?\n")
-			fmt.Printf("[0]\tNone\n")
+			fmt.Printf("[0]\tLocal\n")
 			fmt.Printf("[1]\tAzure File Share\n")
 			fmt.Printf("\nSelection: ")
 			fmt.Scanf("%d\n", &inputInt)
 			switch inputInt {
 			case 0:
-				fmt.Printf("Reminder: remoteStorageType = none\n")
+				fmt.Printf("Reminder: destType = local\n")
 				//Do (nearly) nothing! :D
 
 			case 1:
