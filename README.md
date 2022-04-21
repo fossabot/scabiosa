@@ -35,10 +35,10 @@ YouTrack Issues & Agile Board: [Click me!](https://codenoodles.youtrack.cloud/is
 - OneDrive (far future)
 - GDrive (far future)
 
-| Storage Type            | Config Type              |
-|-------------------------|--------------------------|
-| Azure File Share        | azure-fileshare          |
-| Local Storage           | local                    |
+| Storage Type            | Config Type     |
+|-------------------------|-----------------|
+| Azure File Share        | azure-fileshare |
+| Local Storage           | local           |
 
 
 ## Config Explaination
@@ -81,10 +81,16 @@ YouTrack Issues & Agile Board: [Click me!](https://codenoodles.youtrack.cloud/is
     {
       "backupName": "my-backup",
       "folderPath": "/path/to/folder/to/backup",
-      "remoteStorageType": "remote-type",
-      "remoteTargetPath": "path/to",
-      "createLocalBackup": true,
-      "localTargetPath": "/path/for/local/backup"
+      "destinations": [
+        {
+          "destType": "remote-type",
+          "destPath": "/path/to/where/save"
+        },
+        {
+          "destType": "remote-type",
+          "destPath": "/path/to/another/save"
+        }
+      ]
     }
   ]
 }
@@ -97,10 +103,16 @@ YouTrack Issues & Agile Board: [Click me!](https://codenoodles.youtrack.cloud/is
     {
       "backupName": "my-backup",
       "folderPath": "D:\\Path\\To\\Folder\\To\\Backup",
-      "remoteStorageType": "remote-type",
-      "remoteTargetPath": "path/to",
-      "createLocalBackup": true,
-      "localTargetPath": "E:\\Path\\For\\Local Backup"
+      "destinations": [
+        {
+          "destType": "remote-type",
+          "destPath": "E:\\Path\\To\\Where\\Save"
+        },
+        {
+          "destType": "remote-type",
+          "destPath": "F:\\Path\\To\\Another\\Save"
+        }
+      ]
     }
   ]
 }
