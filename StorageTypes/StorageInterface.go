@@ -6,7 +6,7 @@ type Storage interface {
 	upload(fileName string, backupName string, destinationPath string)
 }
 
-func UploadFile(storage Storage, fileName string, backupName string, destinationPath string) {
+func UploadFile(storage Storage, fileName, backupName, destinationPath string) {
 	storage.upload(fileName, backupName, destinationPath)
 }
 
