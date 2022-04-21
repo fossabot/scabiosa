@@ -48,15 +48,13 @@ func StartBackupProc() {
 
 	for _, backupItem := range config.FolderToBackup {
 		logger.Info(fmt.Sprintf("Starting backup for %s", backupItem.BackupName))
-		var destPath string
+		destPath := "tmp"
 		//TODO: Add os specific tmp folder
-		destPath = "tmp"
 
 		bakFile := Compressor.CreateBakFile(backupItem.BackupName+getTimeSuffix(), backupItem.FolderPath, destPath, backupItem.BackupName)
 
 		for _, backupDestination := range backupItem.Destinations {
-			var storage StorageTypes.Storage
-			storage = StorageTypes.CheckStorageType(backupDestination.DestType)
+			storage := StorageTypes.CheckStorageType(backupDestination.DestType)
 			StorageTypes.UploadFile(storage, bakFile, backupItem.BackupName, backupDestination.DestPath)
 			SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_Upload, StorageTypes.CheckRemoteStorageType(backupDestination.DestType), "Uploaded to destination", time.Now())
 		}
