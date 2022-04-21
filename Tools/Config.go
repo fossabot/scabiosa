@@ -25,11 +25,11 @@ type AzureConfig struct {
 
 type Config struct {
 	FolderToBackup []struct {
-		BackupName        string `json:"backupName"`
-		FolderPath        string `json:"folderPath"`
+		BackupName   string `json:"backupName"`
+		FolderPath   string `json:"folderPath"`
 		Destinations []struct {
-			DestType	string `json:"destType"`
-			DestPath	string `json:"dstPath"`
+			DestType string `json:"destType"`
+			DestPath string `json:"destPath"`
 		} `json:"destinations"`
 	} `json:"foldersToBackup"`
 }
