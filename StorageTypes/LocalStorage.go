@@ -13,7 +13,7 @@ import (
 
 type LocalStorage struct{}
 
-func (_ LocalStorage) upload(fileName, backupName, destinationPath string) {
+func (LocalStorage) upload(fileName, backupName, destinationPath string) {
 	logger := Logging.BasicLog
 
 	srcFile, srcErr := os.Open(fileName)
