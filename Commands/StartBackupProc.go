@@ -49,6 +49,8 @@ func StartBackupProc() {
 	for _, backupItem := range config.FolderToBackup {
 		logger.Info(fmt.Sprintf("Starting backup for %s", backupItem.BackupName))
 		var destPath string
+		//TODO: Add os specific tmp folder
+		destPath = "tmp"
 
 		bakFile := Compressor.CreateBakFile(backupItem.BackupName+getTimeSuffix(), backupItem.FolderPath, destPath, backupItem.BackupName)
 
@@ -59,11 +61,11 @@ func StartBackupProc() {
 			SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_Upload, StorageTypes.CheckRemoteStorageType(backupDestination.DestType), "Uploaded to destination", time.Now())
 		}
 
-			_ = os.Remove(bakFile)
-			SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_DeleteTmp, SQL.REMOTE_NONE, "Deleted tmp file", time.Now())
+		_ = os.Remove(bakFile)
+		SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_DeleteTmp, SQL.REMOTE_NONE, "Deleted tmp file", time.Now())
 		SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), false, backupItem.FolderPath, SQL.REMOTE_NONE, "NULL", "NULL")
 		logger.Info(fmt.Sprintf("Finished backup for %s", backupItem.BackupName))
-		}
+	}
 }
 
 func getTimeSuffix() string {
@@ -76,7 +78,7 @@ func getTimeSuffix() string {
 func checkTmpPath() {
 	logger := Logging.BasicLog
 	if _, err := os.Stat("tmp"); os.IsNotExist(err) {
-		dirErr := os.Mkdir("tmp", 0600)
+		dirErr := os.Mkdir("tmp", 0700)
 		if dirErr != nil {
 			logger.Fatal(err)
 		}
