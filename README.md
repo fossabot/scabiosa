@@ -38,7 +38,7 @@ YouTrack Issues & Agile Board: [Click me!](https://codenoodles.youtrack.cloud/is
 | Storage Type            | Config Type              |
 |-------------------------|--------------------------|
 | Azure File Share        | azure-fileshare          |
-| Local Storage           | none                     |
+| Local Storage           | local                    |
 
 
 ## Config Explaination
