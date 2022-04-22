@@ -103,26 +103,26 @@ func (mariadb MariaDBConnector) newLogEntry(uuid uuid.UUID, logType LogType, bac
 
 	hostname, _ := os.Hostname()
 
-	_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.EventLog VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", uuid.String(), logType.String(), hostname, backupName, stage, strconv.FormatInt(int64(storageType), 10), description, description, timestamp)
+	_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.EventLog VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", uuid.String(), logType.String(), hostname, backupName, stage, strconv.FormatInt(int64(storageType), 10), destination, description, timestamp)
 	if err != nil {
 		logger.Fatal(err)
 	}
 
 }
 
-func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath, localPath string) {
+func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup time.Time, storageType RemoteStorageType, sourcePath, destPath string) {
 	logger := Logging.BasicLog
 	db := createMariaDBConnection(mariadb)
 
 	hostname, _ := os.Hostname()
 
 	if mariadb.checkIfBackupEntryExist(db, backupName, hostname) {
-		_, err := db.Query("UPDATE `"+mariadb.Database+"`.Backups SET LastBackup = ?, LocalBackup = ?, RemoteStorage = ?, RemotePath = ?, LocalPath = ? WHERE Hostname = ? AND BackupName = ?;", lastBackup, localBackup, strconv.FormatInt(int64(storageType), 10), remotePath, localPath, hostname, backupName)
+		_, err := db.Query("UPDATE `"+mariadb.Database+"`.Backups SET LastBackup = ?, Storage = ?, SourcePath = ?, DestinationPath = ? WHERE Hostname = ? AND BackupName = ?;", lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, destPath, hostname, backupName)
 		if err != nil {
 			logger.Fatal(err)
 		}
 	} else {
-		_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.Backups VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", uuid.New(), hostname, backupName, lastBackup, localBackup, filePath, strconv.FormatInt(int64(storageType), 10), remotePath, localPath)
+		_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.Backups VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", uuid.New(), hostname, backupName, lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, destPath)
 		if err != nil {
 			logger.Fatal(err)
 		}
