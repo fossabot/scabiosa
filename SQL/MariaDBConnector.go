@@ -97,13 +97,13 @@ func (mariadb MariaDBConnector) createDefaultTables() {
 	_ = db.Close()
 }
 
-func (mariadb MariaDBConnector) newLogEntry(uuid uuid.UUID, logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, description string, timestamp time.Time) {
+func (mariadb MariaDBConnector) newLogEntry(uuid uuid.UUID, logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, destination, description string, timestamp time.Time) {
 	logger := Logging.BasicLog
 	db := createMariaDBConnection(mariadb)
 
 	hostname, _ := os.Hostname()
 
-	_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.EventLog VALUES (?, ?, ?, ?, ?, ?, ?, ?);", uuid.String(), logType.String(), hostname, backupName, stage, strconv.FormatInt(int64(storageType), 10), description, timestamp)
+	_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.EventLog VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", uuid.String(), logType.String(), hostname, backupName, stage, strconv.FormatInt(int64(storageType), 10), description, description, timestamp)
 	if err != nil {
 		logger.Fatal(err)
 	}
