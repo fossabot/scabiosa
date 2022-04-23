@@ -53,7 +53,6 @@ func StartBackupProc() {
 		for _, backupDestination := range backupItem.Destinations {
 			storage := StorageTypes.CheckStorageType(backupDestination.DestType)
 			StorageTypes.UploadFile(storage, bakFile, backupItem.BackupName, backupDestination.DestPath)
-			SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupItem.BackupName, SQL.SqlstageUpload, StorageTypes.CheckRemoteStorageType(backupDestination.DestType), backupDestination.DestPath, "Uploaded to destination", time.Now())
 			SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), SQL.RemoteNone, backupItem.FolderPath, backupDestination.DestPath)
 		}
 
