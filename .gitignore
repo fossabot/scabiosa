@@ -11,6 +11,9 @@ scabiosa
 scabiosa-Win32.exe
 scaboisa-Win64.exe
 
+#Valgrind
+vgcore.*
+
 # Log Files
 *.log
 

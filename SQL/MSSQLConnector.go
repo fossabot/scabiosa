@@ -42,8 +42,8 @@ func (MSSQLConnector) checkIfBackupTableExist(db *sql.DB) bool {
 	return rows.Next()
 }
 
-func (MSSQLConnector) checkIfBackupEntryExist(db *sql.DB, backupName, hostname string) bool {
-	query := fmt.Sprintf("SELECT * FROM dbo.Backups WHERE Hostname = '%s' AND BackupName = '%s'", hostname, backupName)
+func (MSSQLConnector) checkIfBackupEntryExist(db *sql.DB, backupName, hostname, destPath string) bool {
+	query := fmt.Sprintf("SELECT * FROM dbo.Backups WHERE Hostname = '%s' AND BackupName = '%s' AND DestinationPath = '%s'", hostname, backupName, destPath)
 	rows, _ := db.Query(query)
 	return rows.Next()
 }
@@ -53,7 +53,7 @@ func createMSSQLConnection(mssql MSSQLConnector) *sql.DB {
 
 	query := url.Values{}
 	query.Add("app name", "scabiosa")
-	query.Add("database", "scabiosa-test")
+	query.Add("database", mssql.Database)
 
 	sqlSettings := &url.URL{
 		Scheme:   "sqlserver",
@@ -77,8 +77,25 @@ func createMSSQLConnection(mssql MSSQLConnector) *sql.DB {
 func (mssql MSSQLConnector) createDefaultTables() {
 	logger := Logging.BasicLog
 
-	eventLogSQL := "create table dbo.EventLog(UUID text null, LogType VARCHAR(20) NOT NULL CHECK (LogType IN('INFO', 'WARNING', 'ERROR', 'FATAL')), Hostname varchar(256) null, BackupName varchar(256) null, Stage VARCHAR(20) NOT NULL CHECK (Stage IN('COMPRESS', 'UPLOAD', 'DELETE TMP')), RemoteStorage VARCHAR(20) NOT NULL CHECK (RemoteStorage IN('AZURE-FILE', 'AZURE-BLOB', 'NONE')), Description text null, Timestamp datetime null);"
-	backupSQL := "create table dbo.Backups(UUID text null, Hostname varchar(256) null, BackupName varchar(256) null, LastBackup datetime null, LocalBackup tinyint null, FilePath varchar(256) null, RemoteStorage VARCHAR(20) NOT NULL CHECK (RemoteStorage IN('AZURE-FILE', 'AZURE-BLOB', 'NONE')), RemotePath varchar(256) null, LocalPath varchar(256) null);"
+	eventLogSQL := "create table dbo.EventLog(" +
+		"UUID TEXT null, " +
+		"LogType ENUM ('INFO', 'WARNING', 'ERROR', 'FATAL') null, " +
+		"Hostname VARCHAR(256) null, " +
+		"BackupName VARCHAR(256) null, " +
+		"Stage ENUM ('COMPRESS', 'UPLOAD', 'FINALIZING')  null, " +
+		"Storage ENUM ('AZURE-FILE', 'LOCAL') null, " +
+		"Destination TEXT null, " +
+		"Description TEXT null, " +
+		"Timestamp DATETIME null);"
+
+	backupSQL := "create table dbo.Backups(" +
+		"UUID TEXT null, " +
+		"Hostname VARCHAR(256) null, " +
+		"BackupName VARCHAR(256) null, " +
+		"LastBackup DATETIME null, " +
+		"Storage ENUM('AZURE-FILE', 'LOCAL') null, " +
+		"SourcePath VARCHAR(512) null,  " +
+		"DestinationPath VARCHAR(512) null);"
 
 	db := createMSSQLConnection(mssql)
 
@@ -100,35 +117,31 @@ func (mssql MSSQLConnector) createDefaultTables() {
 }
 
 // skipcq: RVV-A0005
-func (mssql MSSQLConnector) newLogEntry(uuid uuid.UUID, logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, description string, timestamp time.Time) {
+func (mssql MSSQLConnector) newLogEntry(logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, destination, description string, timestamp time.Time) {
 	logger := Logging.BasicLog
 	db := createMSSQLConnection(mssql)
 
 	hostname, _ := os.Hostname()
-	query := fmt.Sprintf("INSERT INTO dbo.EventLog VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", uuid.String(), logType.String(), hostname, backupName, stage.String(), storageType.String(), description, timestamp.Format("2006-01-02 15:04:05.999"))
+	query := fmt.Sprintf("INSERT INTO dbo.EventLog VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", uuid.New(), logType.String(), hostname, backupName, stage.String(), storageType.String(), destination, description, timestamp.Format("2006-01-02 15:04:05.999"))
 	_, err := db.Query(query)
 	if err != nil {
 		logger.Fatal(err)
 	}
 }
-func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Time, localBackup bool, filePath string, storageType RemoteStorageType, remotePath, localPath string) {
+func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Time, storageType RemoteStorageType, sourcePath, destPath string) {
 	logger := Logging.BasicLog
 	db := createMSSQLConnection(mssql)
 
 	hostname, _ := os.Hostname()
-	var localBackupInt uint8
-	if localBackup {
-		localBackupInt = 1
-	}
 
-	if mssql.checkIfBackupEntryExist(db, backupName, hostname) {
-		queryUpdate := fmt.Sprintf("UPDATE dbo.Backups SET Lastbackup = '%s', LocalBackup = %d, RemoteStorage = '%s', RemotePath = '%s', LocalPath = '%s' WHERE Hostname = '%s' AND BackupName = '%s'", lastBackup.Format("2006-01-02 15:04:05.999"), localBackupInt, storageType.String(), remotePath, localPath, hostname, backupName)
+	if mssql.checkIfBackupEntryExist(db, backupName, hostname, destPath) {
+		queryUpdate := fmt.Sprintf("UPDATE dbo.Backups SET Lastbackup = '%s', Storage = '%s', SourcePath = '%s' WHERE Hostname = '%s' AND BackupName = '%s' AND DestinationPath = '%s'", lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, hostname, backupName, destPath)
 		_, err := db.Query(queryUpdate)
 		if err != nil {
 			logger.Fatal(err)
 		}
 	} else {
-		queryInsert := fmt.Sprintf("INSERT INTO dbo.Backups VALUES ('%s', '%s', '%s', '%s', %d, '%s', '%s', '%s', '%s')", uuid.New(), hostname, backupName, lastBackup.Format("2006-01-02 15:04:05.999"), localBackupInt, filePath, storageType.String(), remotePath, localPath)
+		queryInsert := fmt.Sprintf("INSERT INTO dbo.Backups VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')", uuid.New(), hostname, backupName, lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, destPath)
 		_, err := db.Query(queryInsert)
 		if err != nil {
 			logger.Fatal(err)

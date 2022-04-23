@@ -2,8 +2,6 @@ module scabiosa
 
 go 1.17
 
-require github.com/sirupsen/logrus v1.8.1
-
 require (
 	github.com/Azure/azure-storage-file-go v0.8.0
 	github.com/cheggaaa/pb/v3 v3.0.8
