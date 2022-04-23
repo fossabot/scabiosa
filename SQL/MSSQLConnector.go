@@ -84,7 +84,7 @@ func (mssql MSSQLConnector) createDefaultTables() {
 		"BackupName VARCHAR(256) null, " +
 		"Stage ENUM ('COMPRESS', 'UPLOAD', 'COPY')  null, " +
 		"Storage ENUM ('AZURE-FILE', 'LOCAL') null, " +
-		"Destination TEXT null " +
+		"Destination TEXT null, " +
 		"Description TEXT null, " +
 		"Timestamp DATETIME null);"
 
@@ -141,7 +141,7 @@ func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Ti
 			logger.Fatal(err)
 		}
 	} else {
-		queryInsert := fmt.Sprintf("INSERT INTO dbo.Backups VALUES ('%s', '%s', '%s', '%s', %d, '%s', '%s', '%s', '%s')", uuid.New(), hostname, backupName, lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, destPath)
+		queryInsert := fmt.Sprintf("INSERT INTO dbo.Backups VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')", uuid.New(), hostname, backupName, lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, destPath)
 		_, err := db.Query(queryInsert)
 		if err != nil {
 			logger.Fatal(err)

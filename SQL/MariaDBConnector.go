@@ -65,7 +65,7 @@ func (mariadb MariaDBConnector) createDefaultTables() {
 		"BackupName VARCHAR(256) null, " +
 		"Stage ENUM ('COMPRESS', 'UPLOAD', 'COPY')  null, " +
 		"Storage ENUM ('AZURE-FILE', 'LOCAL') null, " +
-		"Destination TEXT null " +
+		"Destination TEXT null, " +
 		"Description TEXT null, " +
 		"Timestamp DATETIME null);"
 
@@ -122,7 +122,7 @@ func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup tim
 			logger.Fatal(err)
 		}
 	} else {
-		_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.Backups VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", uuid.New(), hostname, backupName, lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, destPath)
+		_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.Backups VALUES (?, ?, ?, ?, ?, ?, ?);", uuid.New(), hostname, backupName, lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, destPath)
 		if err != nil {
 			logger.Fatal(err)
 		}
