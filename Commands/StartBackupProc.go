@@ -2,7 +2,6 @@ package Commands
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/urfave/cli/v2"
 	"os"
 	"scabiosa/Compressor"
@@ -48,20 +47,17 @@ func StartBackupProc() {
 
 	for _, backupItem := range config.FolderToBackup {
 		logger.Info(fmt.Sprintf("Starting backup for %s", backupItem.BackupName))
-		destPath := "tmp"
-		//TODO: Add os specific tmp folder
 
-		bakFile := Compressor.CreateBakFile(backupItem.BackupName+getTimeSuffix(), backupItem.FolderPath, destPath, backupItem.BackupName)
+		bakFile := Compressor.CreateBakFile(backupItem.BackupName+getTimeSuffix(), backupItem.FolderPath, backupItem.BackupName)
 
 		for _, backupDestination := range backupItem.Destinations {
 			storage := StorageTypes.CheckStorageType(backupDestination.DestType)
 			StorageTypes.UploadFile(storage, bakFile, backupItem.BackupName, backupDestination.DestPath)
-			SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_Upload, StorageTypes.CheckRemoteStorageType(backupDestination.DestType), "Uploaded to destination", time.Now())
+			SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupItem.BackupName, SQL.SqlstageUpload, StorageTypes.CheckRemoteStorageType(backupDestination.DestType), backupDestination.DestPath, "Uploaded to destination", time.Now())
+			SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), SQL.RemoteNone, backupItem.FolderPath, backupDestination.DestPath)
 		}
 
 		_ = os.Remove(bakFile)
-		SQL.NewLogEntry(SQL.GetSQLInstance(), uuid.New(), SQL.LogInfo, backupItem.BackupName, SQL.SQLStage_DeleteTmp, SQL.REMOTE_NONE, "Deleted tmp file", time.Now())
-		SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), false, backupItem.FolderPath, SQL.REMOTE_NONE, "NULL", "NULL")
 		logger.Info(fmt.Sprintf("Finished backup for %s", backupItem.BackupName))
 	}
 }
