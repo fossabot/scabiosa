@@ -57,8 +57,10 @@ func StartBackupProc() {
 		}
 
 		_ = os.Remove(bakFile)
+		SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupItem.BackupName, SQL.SqlStageFinialzing, SQL.RemoteNone, "NULL", "Finished Backup.", time.Now())
 		logger.Info(fmt.Sprintf("Finished backup for %s", backupItem.BackupName))
 	}
+
 }
 
 func getTimeSuffix() string {

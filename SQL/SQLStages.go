@@ -5,16 +5,19 @@ import "fmt"
 type SQLStage int64
 
 const (
-	SqlstageCompress = 1
-	SqlstageUpload   = 2
+	SqlStageCompress   = 1
+	SqlStageUpload     = 2
+	SqlStageFinialzing = 3
 )
 
 func (e SQLStage) String() string {
 	switch e {
-	case SqlstageCompress:
+	case SqlStageCompress:
 		return "COMPRESS"
-	case SqlstageUpload:
+	case SqlStageUpload:
 		return "UPLOAD"
+	case SqlStageFinialzing:
+		return "FINALIZING"
 	default:
 		return fmt.Sprintf("%d", e)
 	}

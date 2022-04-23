@@ -26,7 +26,7 @@ func CreateBakFile(fileName, folderPath, backupName string) string {
 	}
 	compress(fileToWrite, folderPath, backupName)
 
-	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlstageCompress, SQL.RemoteNone, "NULL", "File successfully written.", time.Now())
+	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", "File successfully written.", time.Now())
 
 	return pathToFile
 }
@@ -37,7 +37,7 @@ func compress(fileToWrite *os.File, folderPath, backupName string) {
 	zr, _ := gzip.NewWriterLevel(fileToWrite, flate.BestCompression)
 	tw := tar.NewWriter(zr)
 
-	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlstageCompress, SQL.RemoteNone, "NULL", "Start compression", time.Now())
+	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", "Start compression", time.Now())
 	// skipcq: SCC-SA4009
 	filepath.Walk(folderPath, func(file string, fi os.FileInfo, err error) error {
 		header, err := tar.FileInfoHeader(fi, file)
@@ -74,5 +74,5 @@ func compress(fileToWrite *os.File, folderPath, backupName string) {
 		logger.Fatal(err)
 	}
 
-	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlstageCompress, SQL.RemoteNone, "NULL", "Compression complete.", time.Now())
+	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", "Compression complete.", time.Now())
 }

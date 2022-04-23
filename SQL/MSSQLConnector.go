@@ -82,7 +82,7 @@ func (mssql MSSQLConnector) createDefaultTables() {
 		"LogType ENUM ('INFO', 'WARNING', 'ERROR', 'FATAL') null, " +
 		"Hostname VARCHAR(256) null, " +
 		"BackupName VARCHAR(256) null, " +
-		"Stage ENUM ('COMPRESS', 'UPLOAD', 'COPY')  null, " +
+		"Stage ENUM ('COMPRESS', 'UPLOAD', 'FINALIZING')  null, " +
 		"Storage ENUM ('AZURE-FILE', 'LOCAL') null, " +
 		"Destination TEXT null, " +
 		"Description TEXT null, " +

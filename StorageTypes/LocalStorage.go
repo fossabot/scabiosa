@@ -27,12 +27,12 @@ func (LocalStorage) upload(fileName, backupName, destinationPath string) {
 	}
 
 	defer destFile.Close()
-	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlstageUpload, SQL.RemoteNone, destinationPath, "Starting copy process", time.Now())
+	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlStageUpload, SQL.RemoteNone, destinationPath, "Starting copy process", time.Now())
 	logger.Info(fmt.Sprintf("[%s]Starting copy to %s", backupName, destinationPath))
 	if _, err := io.Copy(destFile, srcFile); err != nil {
 		logger.Fatal(err)
 	}
-	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlstageUpload, SQL.RemoteNone, destinationPath, "Finished copy process.", time.Now())
+	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlStageUpload, SQL.RemoteNone, destinationPath, "Finished copy process.", time.Now())
 	logger.Info(fmt.Sprintf("[%s]Copy finished.", backupName))
 }
 

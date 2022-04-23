@@ -48,7 +48,7 @@ func (azure AzureFileStorage) upload(fileName, backupName, destinationPath strin
 	ctx := context.Background()
 
 	logger.Info(fmt.Sprintf("[%s] Starting upload to Azure File Share...\n", backupName))
-	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlstageUpload, SQL.RemoteAzureFile, destinationPath, "Starting upload.", time.Now())
+	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlStageUpload, SQL.RemoteAzureFile, destinationPath, "Starting upload.", time.Now())
 
 	progressBar := pb.StartNew(int(fileSize.Size()))
 	progressBar.Set(pb.Bytes, true)
@@ -68,7 +68,7 @@ func (azure AzureFileStorage) upload(fileName, backupName, destinationPath strin
 	}
 	progressBar.Finish()
 	logger.Info(fmt.Sprintf("[%s] Upload finished.\n", strings.Trim(backupName, ".bak")))
-	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlstageUpload, SQL.RemoteAzureFile, destinationPath, "Finished upload.", time.Now())
+	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlStageUpload, SQL.RemoteAzureFile, destinationPath, "Finished upload.", time.Now())
 }
 
 func readConfig() []byte {
