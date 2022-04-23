@@ -24,11 +24,11 @@ func CheckStorageType(storageType string) Storage {
 
 func CheckRemoteStorageType(storageType string) SQL.RemoteStorageType {
 	if storageType == "azure-fileshare" {
-		return SQL.REMOTE_AZURE_FILE
+		return SQL.RemoteAzureFile
 	}
 	if storageType == "local" {
-		return SQL.REMOTE_NONE
+		return SQL.RemoteNone
 	}
 
-	return SQL.REMOTE_NONE
+	return SQL.RemoteNone
 }

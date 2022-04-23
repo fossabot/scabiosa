@@ -5,19 +5,16 @@ import "fmt"
 type RemoteStorageType int64
 
 const (
-	REMOTE_AZURE_FILE = 1
-	REMOTE_AZURE_BLOB = 2
-	REMOTE_NONE       = 3
+	RemoteAzureFile = 1
+	RemoteNone      = 2
 )
 
 func (e RemoteStorageType) String() string {
 	switch e {
-	case REMOTE_AZURE_FILE:
+	case RemoteAzureFile:
 		return "AZURE-FILE"
-	case REMOTE_AZURE_BLOB:
-		return "AZURE-BLOB"
-	case REMOTE_NONE:
-		return "NONE"
+	case RemoteNone:
+		return "LOCAL"
 	default:
 		return fmt.Sprintf("%d", e)
 	}
