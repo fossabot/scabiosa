@@ -41,8 +41,8 @@ func (mariadb MariaDBConnector) checkIfBackupTableExist(db *sql.DB) bool {
 	return rows.Next()
 }
 
-func (mariadb MariaDBConnector) checkIfBackupEntryExist(db *sql.DB, backupName, hostname string) bool {
-	rows, _ := db.Query("SELECT * FROM `"+mariadb.Database+"`.Backups WHERE Hostname = ? AND BackupName = ?;", hostname, backupName)
+func (mariadb MariaDBConnector) checkIfBackupEntryExist(db *sql.DB, backupName, hostname, destPath string) bool {
+	rows, _ := db.Query("SELECT * FROM `"+mariadb.Database+"`.Backups WHERE Hostname = ? AND BackupName = ? AND DestinationPath = ?;", hostname, backupName, destPath)
 	return rows.Next()
 }
 
@@ -116,8 +116,8 @@ func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup tim
 
 	hostname, _ := os.Hostname()
 
-	if mariadb.checkIfBackupEntryExist(db, backupName, hostname) {
-		_, err := db.Query("UPDATE `"+mariadb.Database+"`.Backups SET LastBackup = ?, Storage = ?, SourcePath = ?, DestinationPath = ? WHERE Hostname = ? AND BackupName = ?;", lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, destPath, hostname, backupName)
+	if mariadb.checkIfBackupEntryExist(db, backupName, hostname, destPath) {
+		_, err := db.Query("UPDATE `"+mariadb.Database+"`.Backups SET LastBackup = ?, Storage = ?, SourcePath = ? WHERE Hostname = ? AND BackupName = ? AND DestinationPath = ?;", lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, hostname, backupName, destPath)
 		if err != nil {
 			logger.Fatal(err)
 		}

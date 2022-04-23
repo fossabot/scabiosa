@@ -42,8 +42,8 @@ func (MSSQLConnector) checkIfBackupTableExist(db *sql.DB) bool {
 	return rows.Next()
 }
 
-func (MSSQLConnector) checkIfBackupEntryExist(db *sql.DB, backupName, hostname string) bool {
-	query := fmt.Sprintf("SELECT * FROM dbo.Backups WHERE Hostname = '%s' AND BackupName = '%s'", hostname, backupName)
+func (MSSQLConnector) checkIfBackupEntryExist(db *sql.DB, backupName, hostname, destPath string) bool {
+	query := fmt.Sprintf("SELECT * FROM dbo.Backups WHERE Hostname = '%s' AND BackupName = '%s' AND DestinationPath = '%s'", hostname, backupName, destPath)
 	rows, _ := db.Query(query)
 	return rows.Next()
 }
@@ -134,8 +134,8 @@ func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Ti
 
 	hostname, _ := os.Hostname()
 
-	if mssql.checkIfBackupEntryExist(db, backupName, hostname) {
-		queryUpdate := fmt.Sprintf("UPDATE dbo.Backups SET Lastbackup = '%s', Storage = '%s', SourcePath = '%s', DestinationPath = '%s' WHERE Hostname = '%s' AND BackupName = '%s'", lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, destPath, hostname, backupName)
+	if mssql.checkIfBackupEntryExist(db, backupName, hostname, destPath) {
+		queryUpdate := fmt.Sprintf("UPDATE dbo.Backups SET Lastbackup = '%s', Storage = '%s', SourcePath = '%s' WHERE Hostname = '%s' AND BackupName = '%s' AND DestinationPath = '%s'", lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, hostname, backupName, destPath)
 		_, err := db.Query(queryUpdate)
 		if err != nil {
 			logger.Fatal(err)
