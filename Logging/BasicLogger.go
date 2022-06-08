@@ -26,14 +26,14 @@ func (*basicLogger) Warn(message string) {
 	warningLogger.Printf(message)
 }
 
-func (*basicLogger) Error(err error) {
-	fmt.Printf("[ERROR] %s\n", err.Error())
-	errorLogger.Print(err)
+func (*basicLogger) Error(params ...interface{}) {
+	fmt.Printf("[ERROR] %s\n", params)
+	errorLogger.Print(params)
 }
 
-func (*basicLogger) Fatal(err error) {
-	fmt.Printf("[ERROR] %s\n", err.Error())
-	errorLogger.Fatal(err)
+func (*basicLogger) Fatal(params ...interface{}) {
+	fmt.Printf("[ERROR] %s\n", params)
+	errorLogger.Fatal(params)
 }
 
 func (*basicLogger) Init() {
