@@ -22,6 +22,7 @@ func CreateBakFile(fileName, folderPath, backupName string) string {
 
 	fileToWrite, err := os.OpenFile(pathToFile, os.O_CREATE|os.O_RDWR, os.FileMode(0600))
 	if err != nil {
+		SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", err.Error(), time.Now())
 		logger.Fatal(err)
 	}
 	compress(fileToWrite, folderPath, backupName)
@@ -42,6 +43,7 @@ func compress(fileToWrite *os.File, folderPath, backupName string) {
 	filepath.Walk(folderPath, func(file string, fi os.FileInfo, err error) error {
 		header, err := tar.FileInfoHeader(fi, file)
 		if err != nil {
+			SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", err.Error(), time.Now())
 			logger.Fatal(err)
 		}
 
@@ -49,16 +51,19 @@ func compress(fileToWrite *os.File, folderPath, backupName string) {
 
 		header.Name = relPath
 		if err := tw.WriteHeader(header); err != nil {
+			SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", err.Error(), time.Now())
 			logger.Fatal(err)
 		}
 
 		if !fi.IsDir() {
 			data, err := os.Open(file)
 			if err != nil {
+				SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", err.Error(), time.Now())
 				logger.Fatal(err)
 			}
 
 			if _, err := io.Copy(tw, data); err != nil {
+				SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", err.Error(), time.Now())
 				logger.Fatal(err)
 			}
 		}
@@ -67,10 +72,12 @@ func compress(fileToWrite *os.File, folderPath, backupName string) {
 	})
 
 	if err := tw.Close(); err != nil {
+		SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", err.Error(), time.Now())
 		logger.Fatal(err)
 	}
 
 	if err := zr.Close(); err != nil {
+		SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", err.Error(), time.Now())
 		logger.Fatal(err)
 	}
 
