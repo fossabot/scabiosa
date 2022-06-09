@@ -27,21 +27,28 @@ func (azure AzureFileStorage) upload(fileName, backupName, destinationPath strin
 
 	file, err := os.Open(fileName)
 	if err != nil {
+		SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageUpload, SQL.RemoteAzureFile, destinationPath, err.Error(), time.Now())
 		logger.Fatal(err)
 	}
 	defer file.Close()
 
 	fileSize, err := file.Stat()
 	if err != nil {
+		SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageUpload, SQL.RemoteAzureFile, destinationPath, err.Error(), time.Now())
 		logger.Fatal(err)
 	}
 
 	credential, err := azfile.NewSharedKeyCredential(azure.StorageAccountName, azure.StorageAccountKey)
 	if err != nil {
+		SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageUpload, SQL.RemoteAzureFile, destinationPath, err.Error(), time.Now())
 		logger.Fatal(err)
 	}
 
-	u, _ := url.Parse(fmt.Sprintf("https://%s.file.core.windows.net/%s/%s/%s", azure.StorageAccountName, azure.FileshareName, destinationPath, filepath.Base(fileName)))
+	u, err := url.Parse(fmt.Sprintf("https://%s.file.core.windows.net/%s/%s/%s", azure.StorageAccountName, azure.FileshareName, destinationPath, filepath.Base(fileName)))
+	if err != nil {
+		SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageUpload, SQL.RemoteAzureFile, destinationPath, err.Error(), time.Now())
+		logger.Fatal(err)
+	}
 
 	fileURL := azfile.NewFileURL(*u, azfile.NewPipeline(credential, azfile.PipelineOptions{}))
 
@@ -60,10 +67,10 @@ func (azure AzureFileStorage) upload(fileName, backupName, destinationPath strin
 			},
 			Progress: func(bytesTransferred int64) {
 				progressBar.SetCurrent(bytesTransferred)
-				//fmt.Printf("[%s] Uploaded %d of %d bytes.\n", strings.Trim(backupName, ".bak") ,bytesTransferred, fileSize.Size())
 			}})
 
 	if err != nil {
+		SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageUpload, SQL.RemoteAzureFile, destinationPath, err.Error(), time.Now())
 		logger.Fatal(err)
 	}
 	progressBar.Finish()
