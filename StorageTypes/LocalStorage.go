@@ -23,6 +23,7 @@ func (LocalStorage) upload(fileName, backupName, destinationPath string) {
 
 	destFile, destErr := os.OpenFile(destinationPath+string(os.PathSeparator)+filepath.Base(fileName), os.O_CREATE|os.O_RDWR, os.FileMode(0600))
 	if destErr != nil {
+		SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageUpload, SQL.RemoteNone, destinationPath, destErr.Error(), time.Now())
 		logger.Fatal(destErr)
 	}
 
@@ -30,6 +31,7 @@ func (LocalStorage) upload(fileName, backupName, destinationPath string) {
 	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlStageUpload, SQL.RemoteNone, destinationPath, "Starting copy process", time.Now())
 	logger.Info(fmt.Sprintf("[%s]Starting copy to %s", backupName, destinationPath))
 	if _, err := io.Copy(destFile, srcFile); err != nil {
+		SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupName, SQL.SqlStageUpload, SQL.RemoteNone, destinationPath, err.Error(), time.Now())
 		logger.Fatal(err)
 	}
 	SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupName, SQL.SqlStageUpload, SQL.RemoteNone, destinationPath, "Finished copy process.", time.Now())
