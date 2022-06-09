@@ -32,17 +32,29 @@ func GetMariaDBInstance(sqlConfig *Tools.SQLConfig) MariaDBConnector {
 }
 
 func (mariadb MariaDBConnector) checkIfEventLogTableExist(db *sql.DB) bool {
-	rows, _ := db.Query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'EventLog';", mariadb.Database)
+	logger := Logging.BasicLog
+	rows, err := db.Query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'EventLog';", mariadb.Database)
+	if err != nil {
+		logger.Fatal("SQL", err)
+	}
 	return rows.Next()
 }
 
 func (mariadb MariaDBConnector) checkIfBackupTableExist(db *sql.DB) bool {
-	rows, _ := db.Query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'Backups';", mariadb.Database)
+	logger := Logging.BasicLog
+	rows, err := db.Query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'Backups';", mariadb.Database)
+	if err != nil {
+		logger.Fatal("SQL", err)
+	}
 	return rows.Next()
 }
 
 func (mariadb MariaDBConnector) checkIfBackupEntryExist(db *sql.DB, backupName, hostname, destPath string) bool {
-	rows, _ := db.Query("SELECT * FROM `"+mariadb.Database+"`.Backups WHERE Hostname = ? AND BackupName = ? AND DestinationPath = ?;", hostname, backupName, destPath)
+	logger := Logging.BasicLog
+	rows, err := db.Query("SELECT * FROM `"+mariadb.Database+"`.Backups WHERE Hostname = ? AND BackupName = ? AND DestinationPath = ?;", hostname, backupName, destPath)
+	if err != nil {
+		logger.Fatal("SQL", err)
+	}
 	return rows.Next()
 }
 
@@ -50,7 +62,7 @@ func createMariaDBConnection(mariadb MariaDBConnector) *sql.DB {
 	logger := Logging.BasicLog
 	db, err := sql.Open("mysql", mariadb.DbUser+":"+mariadb.DbPassword+"@("+mariadb.Address+":"+strconv.Itoa(int(mariadb.Port))+")/"+mariadb.Database)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatal("SQL", err)
 	}
 	return db
 }
@@ -83,14 +95,14 @@ func (mariadb MariaDBConnector) createDefaultTables() {
 	if !mariadb.checkIfBackupTableExist(db) {
 		_, err := db.Exec(backupSQL)
 		if err != nil {
-			logger.Fatal(err)
+			logger.Fatal("SQL", err)
 		}
 	}
 
 	if !mariadb.checkIfEventLogTableExist(db) {
 		_, err := db.Exec(eventLogSQL)
 		if err != nil {
-			logger.Fatal(err)
+			logger.Fatal("SQL", err)
 		}
 	}
 
@@ -105,7 +117,7 @@ func (mariadb MariaDBConnector) newLogEntry(logType LogType, backupName string, 
 
 	_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.EventLog VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", uuid.New(), logType.String(), hostname, backupName, stage, strconv.FormatInt(int64(storageType), 10), destination, description, timestamp)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatal("SQL", err)
 	}
 
 }
@@ -119,12 +131,12 @@ func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup tim
 	if mariadb.checkIfBackupEntryExist(db, backupName, hostname, destPath) {
 		_, err := db.Query("UPDATE `"+mariadb.Database+"`.Backups SET LastBackup = ?, Storage = ?, SourcePath = ? WHERE Hostname = ? AND BackupName = ? AND DestinationPath = ?;", lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, hostname, backupName, destPath)
 		if err != nil {
-			logger.Fatal(err)
+			logger.Fatal("SQL", err)
 		}
 	} else {
 		_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.Backups VALUES (?, ?, ?, ?, ?, ?, ?);", uuid.New(), hostname, backupName, lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, destPath)
 		if err != nil {
-			logger.Fatal(err)
+			logger.Fatal("SQL", err)
 		}
 	}
 }
