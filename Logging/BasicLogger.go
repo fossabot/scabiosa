@@ -28,12 +28,12 @@ func (*basicLogger) Warn(message string) {
 
 func (*basicLogger) Error(params ...interface{}) {
 	fmt.Printf("[ERROR] %s\n", params)
-	errorLogger.Print(params)
+	errorLogger.Printf("%v", params)
 }
 
 func (*basicLogger) Fatal(params ...interface{}) {
-	fmt.Printf("[ERROR] %s\n", params)
-	errorLogger.Fatal(params)
+	fmt.Printf("[FATAL] %s\n", params)
+	errorLogger.Fatalf("%v", params)
 }
 
 func (*basicLogger) Init() {
