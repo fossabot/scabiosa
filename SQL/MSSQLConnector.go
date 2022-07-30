@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"net/url"
 	"os"
+	"scabiosa/Compressor"
 	"scabiosa/Logging"
 	"scabiosa/Tools"
 	"time"
@@ -107,7 +108,9 @@ func (mssql MSSQLConnector) createDefaultTables() {
 		"LastBackup DATETIME null, " +
 		"Storage ENUM('AZURE-FILE', 'LOCAL') null, " +
 		"SourcePath VARCHAR(512) null,  " +
-		"DestinationPath VARCHAR(512) null);"
+		"DestinationPath VARCHAR(512) null, " +
+		"ChecksumType ENUM ('SHA256', 'MD5') null, " +
+		"Checksum TEXT null);"
 
 	db := createMSSQLConnection(mssql)
 
@@ -140,20 +143,20 @@ func (mssql MSSQLConnector) newLogEntry(logType LogType, backupName string, stag
 		logger.Fatal("SQL", err)
 	}
 }
-func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Time, storageType RemoteStorageType, sourcePath, destPath string) {
+func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Time, storageType RemoteStorageType, sourcePath, destPath string, checksumType Compressor.HashType, checksum string) {
 	logger := Logging.BasicLog
 	db := createMSSQLConnection(mssql)
 
 	hostname, _ := os.Hostname()
 
 	if mssql.checkIfBackupEntryExist(db, backupName, hostname, destPath) {
-		queryUpdate := fmt.Sprintf("UPDATE dbo.Backups SET Lastbackup = '%s', Storage = '%s', SourcePath = '%s' WHERE Hostname = '%s' AND BackupName = '%s' AND DestinationPath = '%s'", lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, hostname, backupName, destPath)
+		queryUpdate := fmt.Sprintf("UPDATE dbo.Backups SET Lastbackup = '%s', Storage = '%s', SourcePath = '%s' WHERE Hostname = '%s' AND BackupName = '%s' AND DestinationPath = '%s' AND ChecksumType = '%s' AND Checksum = '%s'", lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, hostname, backupName, destPath, checksumType.String(), checksum)
 		_, err := db.Query(queryUpdate)
 		if err != nil {
 			logger.Fatal("SQL", err)
 		}
 	} else {
-		queryInsert := fmt.Sprintf("INSERT INTO dbo.Backups VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')", uuid.New(), hostname, backupName, lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, destPath)
+		queryInsert := fmt.Sprintf("INSERT INTO dbo.Backups VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')", uuid.New(), hostname, backupName, lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, destPath, checksumType.String(), checksum)
 		_, err := db.Query(queryInsert)
 		if err != nil {
 			logger.Fatal("SQL", err)
