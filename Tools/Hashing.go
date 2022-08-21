@@ -1,6 +1,7 @@
 package Tools
 
 import (
+	// skipcq: GSC-G501
 	"crypto/md5"
 	"crypto/sha256"
 	"fmt"
@@ -37,7 +38,7 @@ func CalculateHashValue(filePath string, hashType HashType) (string, error) {
 	case SHA256:
 		return fmt.Sprintf("%x", sha256.Sum256(data)), nil
 	case MD5:
-		// skipcq:GSC-G401, GSC-G501, GO-S1023
+		// skipcq:GSC-G401, GO-S1023
 		return fmt.Sprintf("%x", md5.Sum(data)), nil
 	default:
 		return "", fmt.Errorf("you shouldn't be here. [Code 328]")
