@@ -155,7 +155,7 @@ func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Ti
 			logger.Fatal("SQL", err)
 		}
 	} else {
-		queryInsert := fmt.Sprintf("INSERT INTO dbo.Backups VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')", uuid.New(), hostname, backupName, lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, destPath, checksumType.String(), checksum)
+		queryInsert := fmt.Sprintf("INSERT INTO dbo.Backups VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", uuid.New(), hostname, backupName, lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, destPath, checksumType.String(), checksum)
 		_, err := db.Query(queryInsert)
 		if err != nil {
 			logger.Fatal("SQL", err)
