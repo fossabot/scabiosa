@@ -37,7 +37,7 @@ func CalculateHashValue(bakName string, filePath string, hashType HashType) (str
 	case SHA256:
 		return fmt.Sprintf("%x", sha256.Sum256(data)), nil
 	case MD5:
-		// skipcq:GSC-G401
+		// skipcq:GSC-G401, GSC-G501
 		return fmt.Sprintf("%x", md5.Sum(data)), nil
 	default:
 		return "", fmt.Errorf("you shouldn't be here. [Code 328]")
