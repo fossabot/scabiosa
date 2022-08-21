@@ -14,7 +14,7 @@ const (
 	MD5
 )
 
-func openFileAndCalcHash(bakName string, fileData *[]byte, filePath string) error {
+func openFileAndCalcHash(fileData *[]byte, filePath string) error {
 
 	var err error
 	*fileData, err = os.ReadFile(filePath)
@@ -25,10 +25,10 @@ func openFileAndCalcHash(bakName string, fileData *[]byte, filePath string) erro
 	return nil
 }
 
-func CalculateHashValue(bakName string, filePath string, hashType HashType) (string, error) {
+func CalculateHashValue(filePath string, hashType HashType) (string, error) {
 	var data []byte
 
-	err := openFileAndCalcHash(bakName, &data, filePath)
+	err := openFileAndCalcHash(&data, filePath)
 	if err != nil {
 		return "", fmt.Errorf("hash calulation failed. Error: %s", err)
 	}
