@@ -15,7 +15,6 @@ import (
 func CreateBakFile(fileName, folderPath, backupName string) string {
 	logger := Logging.BasicLog
 
-	//TODO: Add os specific tmp folder
 	destinationPath := "tmp"
 
 	pathToFile := destinationPath + string(os.PathSeparator) + fileName + ".bak"
