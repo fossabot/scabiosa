@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"net/url"
 	"os"
-	"scabiosa/Compressor"
 	"scabiosa/Logging"
 	"scabiosa/Tools"
 	"time"
@@ -143,14 +142,14 @@ func (mssql MSSQLConnector) newLogEntry(logType LogType, backupName string, stag
 		logger.Fatal("SQL", err)
 	}
 }
-func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Time, storageType RemoteStorageType, sourcePath, destPath string, checksumType Compressor.HashType, checksum string) {
+func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Time, storageType RemoteStorageType, sourcePath, destPath string, checksumType Tools.HashType, checksum string) {
 	logger := Logging.BasicLog
 	db := createMSSQLConnection(mssql)
 
 	hostname, _ := os.Hostname()
 
 	if mssql.checkIfBackupEntryExist(db, backupName, hostname, destPath) {
-		queryUpdate := fmt.Sprintf("UPDATE dbo.Backups SET Lastbackup = '%s', Storage = '%s', SourcePath = '%s' WHERE Hostname = '%s' AND BackupName = '%s' AND DestinationPath = '%s' AND ChecksumType = '%s' AND Checksum = '%s'", lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, hostname, backupName, destPath, checksumType.String(), checksum)
+		queryUpdate := fmt.Sprintf("UPDATE dbo.Backups SET Lastbackup = '%s', Storage = '%s', SourcePath = '%s', ChecksumType = '%s', Checksum = '%s' WHERE Hostname = '%s' AND BackupName = '%s' AND DestinationPath = '%s'", lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, checksumType.String(), checksum, hostname, backupName, destPath)
 		_, err := db.Query(queryUpdate)
 		if err != nil {
 			logger.Fatal("SQL", err)

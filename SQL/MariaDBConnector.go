@@ -5,7 +5,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"os"
-	"scabiosa/Compressor"
 	"scabiosa/Logging"
 	"scabiosa/Tools"
 	"strconv"
@@ -125,14 +124,14 @@ func (mariadb MariaDBConnector) newLogEntry(logType LogType, backupName string, 
 
 }
 
-func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup time.Time, storageType RemoteStorageType, sourcePath, destPath string, checksumType Compressor.HashType, checksum string) {
+func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup time.Time, storageType RemoteStorageType, sourcePath, destPath string, checksumType Tools.HashType, checksum string) {
 	logger := Logging.BasicLog
 	db := createMariaDBConnection(mariadb)
 
 	hostname, _ := os.Hostname()
 
 	if mariadb.checkIfBackupEntryExist(db, backupName, hostname, destPath) {
-		_, err := db.Query("UPDATE `"+mariadb.Database+"`.Backups SET LastBackup = ?, Storage = ?, SourcePath = ? WHERE Hostname = ? AND BackupName = ? AND DestinationPath = ? AND ChecksumType = ? AND Checksum = ?;", lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, hostname, backupName, destPath, strconv.FormatInt(int64(checksumType), 10), checksum)
+		_, err := db.Query("UPDATE `"+mariadb.Database+"`.Backups SET LastBackup = ?, Storage = ?, SourcePath = ?, ChecksumType = ?, Checksum = ? WHERE Hostname = ? AND BackupName = ? AND DestinationPath = ?;", lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, strconv.FormatInt(int64(checksumType), 10), checksum, hostname, backupName, destPath)
 		if err != nil {
 			logger.Fatal("SQL", err)
 		}
