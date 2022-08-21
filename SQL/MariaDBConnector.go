@@ -88,7 +88,9 @@ func (mariadb MariaDBConnector) createDefaultTables() {
 		"LastBackup DATETIME null, " +
 		"Storage ENUM('AZURE-FILE', 'LOCAL') null, " +
 		"SourcePath VARCHAR(512) null,  " +
-		"DestinationPath VARCHAR(512) null);"
+		"DestinationPath VARCHAR(512) null, " +
+		"ChecksumType ENUM ('SHA256', 'MD5') null, " +
+		"Checksum TEXT null);"
 
 	db := createMariaDBConnection(mariadb)
 
@@ -122,19 +124,19 @@ func (mariadb MariaDBConnector) newLogEntry(logType LogType, backupName string, 
 
 }
 
-func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup time.Time, storageType RemoteStorageType, sourcePath, destPath string) {
+func (mariadb MariaDBConnector) newBackupEntry(backupName string, lastBackup time.Time, storageType RemoteStorageType, sourcePath, destPath string, checksumType Tools.HashType, checksum string) {
 	logger := Logging.BasicLog
 	db := createMariaDBConnection(mariadb)
 
 	hostname, _ := os.Hostname()
 
 	if mariadb.checkIfBackupEntryExist(db, backupName, hostname, destPath) {
-		_, err := db.Query("UPDATE `"+mariadb.Database+"`.Backups SET LastBackup = ?, Storage = ?, SourcePath = ? WHERE Hostname = ? AND BackupName = ? AND DestinationPath = ?;", lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, hostname, backupName, destPath)
+		_, err := db.Query("UPDATE `"+mariadb.Database+"`.Backups SET LastBackup = ?, Storage = ?, SourcePath = ?, ChecksumType = ?, Checksum = ? WHERE Hostname = ? AND BackupName = ? AND DestinationPath = ?;", lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, strconv.FormatInt(int64(checksumType), 10), checksum, hostname, backupName, destPath)
 		if err != nil {
 			logger.Fatal("SQL", err)
 		}
 	} else {
-		_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.Backups VALUES (?, ?, ?, ?, ?, ?, ?);", uuid.New(), hostname, backupName, lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, destPath)
+		_, err := db.Query("INSERT INTO `"+mariadb.Database+"`.Backups VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", uuid.New(), hostname, backupName, lastBackup, strconv.FormatInt(int64(storageType), 10), sourcePath, destPath, strconv.FormatInt(int64(checksumType), 10), checksum)
 		if err != nil {
 			logger.Fatal("SQL", err)
 		}

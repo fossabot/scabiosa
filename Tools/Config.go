@@ -24,6 +24,7 @@ type AzureConfig struct {
 }
 
 type Config struct {
+	UseHashType    string `json:"useHashType"`
 	FolderToBackup []struct {
 		BackupName   string `json:"backupName"`
 		FolderPath   string `json:"folderPath"`

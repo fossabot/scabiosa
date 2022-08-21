@@ -5,7 +5,7 @@ import "fmt"
 type LogType int64
 
 const (
-	LogInfo    LogType = iota
+	LogInfo LogType = iota + 1
 	LogWarning
 	LogError
 	LogFatal

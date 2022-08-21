@@ -53,7 +53,13 @@ func StartBackupProc() {
 		for _, backupDestination := range backupItem.Destinations {
 			storage := StorageTypes.CheckStorageType(backupDestination.DestType)
 			StorageTypes.UploadFile(storage, bakFile, backupItem.BackupName, backupDestination.DestPath)
-			SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), SQL.RemoteNone, backupItem.FolderPath, backupDestination.DestPath)
+			hashValue, err := Tools.CalculateHashValue(bakFile, Tools.GetHashTypeFromString(config.UseHashType))
+			if err != nil {
+				SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupItem.BackupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", err.Error(), time.Now())
+				logger.Fatal(err)
+			}
+
+			SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), SQL.RemoteNone, backupItem.FolderPath, backupDestination.DestPath, Tools.GetHashTypeFromString(config.UseHashType), hashValue)
 		}
 
 		_ = os.Remove(bakFile)
