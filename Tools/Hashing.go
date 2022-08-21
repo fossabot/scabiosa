@@ -1,26 +1,56 @@
-package Compressor
+package Tools
 
 import (
 	"crypto/md5"
 	"crypto/sha256"
 	"fmt"
+	"os"
 )
 
 type HashType int64
 
 const (
-	SHA256 HashType = iota
+	SHA256 HashType = iota + 1
 	MD5
 )
 
-func calculateHashValue(data []byte, hashType HashType) string {
+func openFileAndCalcHash(bakName string, fileData *[]byte, filePath string) error {
+
+	var err error
+	*fileData, err = os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CalculateHashValue(bakName string, filePath string, hashType HashType) (string, error) {
+	var data []byte
+
+	err := openFileAndCalcHash(bakName, &data, filePath)
+	if err != nil {
+		return "", fmt.Errorf("hash calulation failed. Error: %s", err)
+	}
+
 	switch hashType {
 	case SHA256:
-		return fmt.Sprintf("%x", sha256.Sum256(data))
+		return fmt.Sprintf("%x", sha256.Sum256(data)), nil
 	case MD5:
-		return fmt.Sprintf("%x", md5.Sum(data))
+		return fmt.Sprintf("%x", md5.Sum(data)), nil
 	default:
-		return ""
+		return "", fmt.Errorf("you shouldn't be here. [Code 328]")
+	}
+}
+
+func GetHashTypeFromString(name string) HashType {
+	switch name {
+	case HashType(SHA256).String():
+		return SHA256
+	case HashType(MD5).String():
+		return MD5
+	default:
+		return -1
 	}
 }
 
