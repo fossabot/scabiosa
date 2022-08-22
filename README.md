@@ -41,17 +41,26 @@ YouTrack Issues & Agile Board: [Click me!](https://codenoodles.youtrack.cloud/is
 | Local Storage           | local           |
 
 
+## Checksum Hash Types
+ - MD5
+ - SHA256
+
+| Hash Type       | Config Type  |
+|-----------------|--------------|
+| SHA256          | SHA256       |
+| MD5             | MD5          |
 ## Config Explaination
 
 ### config.json
-| Field               |       Type       | Description                                    |
-|---------------------|:----------------:|------------------------------------------------|
-| **foldersToBackup** | ---------------- | ---------------------------------------------- |
-| backupName          |      string      | .bak file name                                 |
-| folderPath          |      string      | Path to folder which should be backed up       |
-| -> **destinations** | ---------------- | ---------------------------------------------- |
-| destType            |      string      | See [StorageTypes](#storage-types)             | 
-| destPath            |      string      | Absolute path where backup should get stored   |
+| Field               |       Type       | Description                                                           |
+|---------------------|:----------------:|-----------------------------------------------------------------------|
+| useHashType         |      string      | Sets the checksum type. See [ChecksumHashTypes](#checksum-hash-types) |
+| **foldersToBackup** | ---------------- | --------------------------------------------------------------------- |
+| backupName          |      string      | .bak file name                                                        |
+| folderPath          |      string      | Path to folder which should be backed up                              |
+| -> **destinations** | ---------------- | --------------------------------------------------------------------- |
+| destType            |      string      | See [StorageTypes](#storage-types)                                    | 
+| destPath            |      string      | Absolute path where backup should get stored                          |
 
 ### sql-config.json
 | Field        |       Type       | Description                                    |
@@ -77,6 +86,7 @@ YouTrack Issues & Agile Board: [Click me!](https://codenoodles.youtrack.cloud/is
 ### config.json (Linux)
 ```
 {
+  "useHashType: "SHA256",
   "foldersToBackup": [
     {
       "backupName": "my-backup",
@@ -99,6 +109,7 @@ YouTrack Issues & Agile Board: [Click me!](https://codenoodles.youtrack.cloud/is
 ### config.json (Windows)
 ```
 {
+  "useHashType": "SHA256",
   "foldersToBackup": [
     {
       "backupName": "my-backup",
