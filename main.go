@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 
-	logger.Init()
+	Logging.InitLogger(logger)
 
 	app := &cli.App{
 		Name:  "scabiosa",
@@ -30,8 +30,8 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		logger.Fatal(err)
+		Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error()})
 	}
 
-	logger.Info("Finished. Exiting...")
+	Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "Finished. Exiting..."})
 }
