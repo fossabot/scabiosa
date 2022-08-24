@@ -111,7 +111,7 @@ func (mariadb MariaDBConnector) createDefaultTables() {
 	_ = db.Close()
 }
 
-func (mariadb MariaDBConnector) newLogEntry(logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, destination, description string, timestamp time.Time) {
+func (mariadb MariaDBConnector) newLogEntry(logType Logging.LogType, backupName string, stage SQLStage, storageType RemoteStorageType, destination, description string, timestamp time.Time) {
 	logger := Logging.BasicLog
 	db := createMariaDBConnection(mariadb)
 

@@ -131,7 +131,7 @@ func (mssql MSSQLConnector) createDefaultTables() {
 }
 
 // skipcq: RVV-A0005
-func (mssql MSSQLConnector) newLogEntry(logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, destination, description string, timestamp time.Time) {
+func (mssql MSSQLConnector) newLogEntry(logType Logging.LogType, backupName string, stage SQLStage, storageType RemoteStorageType, destination, description string, timestamp time.Time) {
 	logger := Logging.BasicLog
 	db := createMSSQLConnection(mssql)
 

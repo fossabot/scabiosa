@@ -1,13 +1,14 @@
 package SQL
 
 import (
+	"scabiosa/Logging"
 	"scabiosa/Tools"
 	"time"
 )
 
 type SQLService interface {
 	createDefaultTables()
-	newLogEntry(logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, destination, description string, timestamp time.Time)
+	newLogEntry(logType Logging.LogType, backupName string, stage SQLStage, storageType RemoteStorageType, destination, description string, timestamp time.Time)
 	newBackupEntry(backupName string, lastBackup time.Time, storageType RemoteStorageType, sourcePath, destPath string, checksumType Tools.HashType, checksum string)
 }
 
@@ -18,7 +19,7 @@ func CreateDefaultTables(sqlService SQLService) {
 	}
 }
 
-func NewLogEntry(sqlService SQLService, logType LogType, backupName string, stage SQLStage, storageType RemoteStorageType, destination, description string, timestamp time.Time) {
+func NewLogEntry(sqlService SQLService, logType Logging.LogType, backupName string, stage SQLStage, storageType RemoteStorageType, destination, description string, timestamp time.Time) {
 	sqlConfig := Tools.GetSQLConfig()
 	if sqlConfig.EnableSQL {
 		sqlService.newLogEntry(logType, backupName, stage, storageType, destination, description, timestamp)

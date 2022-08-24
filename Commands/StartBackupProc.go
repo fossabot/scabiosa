@@ -55,7 +55,7 @@ func StartBackupProc() {
 			StorageTypes.UploadFile(storage, bakFile, backupItem.BackupName, backupDestination.DestPath)
 			hashValue, err := Tools.CalculateHashValue(bakFile, Tools.GetHashTypeFromString(config.UseHashType))
 			if err != nil {
-				SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogFatal, backupItem.BackupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", err.Error(), time.Now())
+				SQL.NewLogEntry(SQL.GetSQLInstance(), Logging.LogFatal, backupItem.BackupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", err.Error(), time.Now())
 				logger.Fatal(err)
 			}
 
@@ -63,7 +63,7 @@ func StartBackupProc() {
 		}
 
 		_ = os.Remove(bakFile)
-		SQL.NewLogEntry(SQL.GetSQLInstance(), SQL.LogInfo, backupItem.BackupName, SQL.SqlStageFinialzing, SQL.RemoteNone, "NULL", "Finished Backup.", time.Now())
+		SQL.NewLogEntry(SQL.GetSQLInstance(), Logging.LogInfo, backupItem.BackupName, SQL.SqlStageFinialzing, SQL.RemoteNone, "NULL", "Finished Backup.", time.Now())
 		logger.Info(fmt.Sprintf("Finished backup for %s", backupItem.BackupName))
 	}
 
