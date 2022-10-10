@@ -27,7 +27,7 @@ type LogEntry struct {
 
 func GetLoggingInstance() ILogger {
 
-	return getBasicLogger()
+	return GetBasicLogger()
 }
 
 func InitLogger(logger ILogger) {
