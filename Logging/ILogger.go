@@ -17,7 +17,7 @@ type ILogger interface {
 type LogEntry struct {
 	uuid       uuid.UUID
 	logType    LogType
-	Hostname   string
+	hostname   string
 	CurrBackup string
 	CurrModule string
 	CurrDest   string
@@ -27,7 +27,7 @@ type LogEntry struct {
 
 func GetLoggingInstance() ILogger {
 
-	return GetBasicLogger()
+	return getBasicLogger()
 }
 
 func InitLogger(logger ILogger) {
@@ -57,5 +57,5 @@ func NewFatalEntry(logger ILogger, entry LogEntry) {
 func fillBaseEntryData(entry *LogEntry) {
 	entry.uuid, _ = uuid.NewUUID()
 	entry.timeStamp = time.Now()
-	entry.Hostname, _ = os.Hostname()
+	entry.hostname, _ = os.Hostname()
 }

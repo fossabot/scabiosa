@@ -9,7 +9,7 @@ import (
 
 type BasicLogger struct{}
 
-func GetBasicLogger() BasicLogger {
+func getBasicLogger() BasicLogger {
 	var basicLogger BasicLogger
 
 	return basicLogger
