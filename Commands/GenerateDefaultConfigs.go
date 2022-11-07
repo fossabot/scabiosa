@@ -9,7 +9,7 @@ import (
 )
 
 func GenerateNewConfigsCommand() *cli.Command {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 
 	return &cli.Command{
 		Name:        "generate-config",
@@ -17,18 +17,18 @@ func GenerateNewConfigsCommand() *cli.Command {
 		Description: "Creates the specified configs",
 		HelpName:    "generate-config",
 		Action: func(c *cli.Context) error {
-			logger.Info("Entering configuration assistant...")
+			Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "Starting config assistant", CurrModule: "ConfigAssistant"})
 			err := os.RemoveAll("config/")
 			if err != nil {
-				logger.Fatal(err)
+				Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "ConfigAssistant"})
 			}
-			logger.Info("Deleted config folder.")
+			Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "Deleted config folder", CurrModule: "ConfigAssistant"})
 
 			dirCreateErr := os.Mkdir("config", 0700)
 			if dirCreateErr != nil {
-				logger.Fatal(err)
+				Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "ConfigAssistant"})
 			}
-			logger.Info("Created config folder.")
+			Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "Created config folder", CurrModule: "ConfigAssistant"})
 
 			var sqlConfig Tools.SQLConfig
 			var input string
@@ -67,7 +67,7 @@ func GenerateNewConfigsCommand() *cli.Command {
 				fmt.Scanf("%s\n", &sqlConfig.DbPassword)
 
 				Tools.GenerateSQLConfig(&sqlConfig)
-				logger.Info("SQL config created!")
+				Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "SQL config created", CurrModule: "ConfigAssistant"})
 
 			} else {
 				sqlConfig.EnableSQL = false
@@ -101,14 +101,14 @@ func GenerateNewConfigsCommand() *cli.Command {
 			}
 
 			Tools.GenerateBaseConfig()
-			logger.Info("All configs generated!")
-			logger.Info("Please modify the config.json with your backup entries.")
+			Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "All configs generated", CurrModule: "ConfigAssistant"})
+			Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "Please modify the config.json with your backup entries.", CurrModule: "ConfigAssistant"})
 
 			return nil
 		},
 		OnUsageError: func(cc *cli.Context, err error, isSubcommand bool) error {
 			if err != nil {
-				logger.Fatal(err)
+				Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "ConfigAssistant"})
 			}
 			return err
 		},

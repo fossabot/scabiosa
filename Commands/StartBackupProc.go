@@ -1,7 +1,6 @@
 package Commands
 
 import (
-	"fmt"
 	"github.com/urfave/cli/v2"
 	"os"
 	"scabiosa/Compressor"
@@ -13,7 +12,7 @@ import (
 )
 
 func StartBackupProcCommand() *cli.Command {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 
 	return &cli.Command{
 		Name:        "backup",
@@ -26,7 +25,7 @@ func StartBackupProcCommand() *cli.Command {
 		},
 		OnUsageError: func(cc *cli.Context, err error, isSubcommand bool) error {
 			if err != nil {
-				logger.Fatal(err)
+				Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "Backup"})
 			}
 			return err
 		},
@@ -36,17 +35,17 @@ func StartBackupProcCommand() *cli.Command {
 func StartBackupProc() {
 	Tools.CheckIfConfigExists()
 	config := Tools.GetConfig()
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 
-	logger.Info("Entering backup util...")
+	Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "Entering backup util...", CurrModule: "Backup"})
 
-	logger.Info("Creating SQL Tables if not existing")
+	Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "Creating SQL Tables if not existing", CurrModule: "Backup"})
 	SQL.CreateDefaultTables(SQL.GetSQLInstance())
 
 	checkTmpPath()
 
 	for _, backupItem := range config.FolderToBackup {
-		logger.Info(fmt.Sprintf("Starting backup for %s", backupItem.BackupName))
+		Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "Starting backup.", CurrBackup: backupItem.BackupName, CurrModule: "Backup"})
 
 		bakFile := Compressor.CreateBakFile(backupItem.BackupName+getTimeSuffix(), backupItem.FolderPath, backupItem.BackupName)
 
@@ -56,7 +55,7 @@ func StartBackupProc() {
 			hashValue, err := Tools.CalculateHashValue(bakFile, Tools.GetHashTypeFromString(config.UseHashType))
 			if err != nil {
 				SQL.NewLogEntry(SQL.GetSQLInstance(), Logging.LogFatal, backupItem.BackupName, SQL.SqlStageCompress, SQL.RemoteNone, "NULL", err.Error(), time.Now())
-				logger.Fatal(err)
+				Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrBackup: backupItem.BackupName, CurrDest: backupDestination.DestPath, CurrModule: "Backup"})
 			}
 
 			SQL.NewBackupEntry(SQL.GetSQLInstance(), backupItem.BackupName, time.Now(), SQL.RemoteNone, backupItem.FolderPath, backupDestination.DestPath, Tools.GetHashTypeFromString(config.UseHashType), hashValue)
@@ -64,7 +63,7 @@ func StartBackupProc() {
 
 		_ = os.Remove(bakFile)
 		SQL.NewLogEntry(SQL.GetSQLInstance(), Logging.LogInfo, backupItem.BackupName, SQL.SqlStageFinialzing, SQL.RemoteNone, "NULL", "Finished Backup.", time.Now())
-		logger.Info(fmt.Sprintf("Finished backup for %s", backupItem.BackupName))
+		Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "Finished backup", CurrBackup: backupItem.BackupName, CurrModule: "Backup"})
 	}
 
 }
@@ -77,12 +76,12 @@ func getTimeSuffix() string {
 
 // skipcq: RVV-A0005
 func checkTmpPath() {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 	if _, err := os.Stat("tmp"); os.IsNotExist(err) {
 		dirErr := os.Mkdir("tmp", 0700)
 		if dirErr != nil {
-			logger.Fatal(err)
+			Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "Backup"})
 		}
-		logger.Info("tmp folder successfully created.")
+		Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "tmp folder successfully created", CurrModule: "Backup"})
 	}
 }
