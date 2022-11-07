@@ -1,6 +1,6 @@
 module scabiosa
 
-go 1.17
+go 1.19
 
 require (
 	github.com/Azure/azure-storage-file-go v0.8.0
