@@ -33,35 +33,35 @@ func GetMSSQLInstance(sqlConfig *Tools.SQLConfig) MSSQLConnector {
 }
 
 func (MSSQLConnector) checkIfEventLogTableExist(db *sql.DB) bool {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 	rows, err := db.Query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'EventLog';")
 	if err != nil {
-		logger.Fatal("SQL", err)
+		Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "MSSQL"})
 	}
 	return rows.Next()
 }
 
 func (MSSQLConnector) checkIfBackupTableExist(db *sql.DB) bool {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 	rows, err := db.Query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Backups';")
 	if err != nil {
-		logger.Fatal("SQL", err)
+		Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "MSSQL"})
 	}
 	return rows.Next()
 }
 
 func (MSSQLConnector) checkIfBackupEntryExist(db *sql.DB, backupName, hostname, destPath string) bool {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 	query := fmt.Sprintf("SELECT * FROM dbo.Backups WHERE Hostname = '%s' AND BackupName = '%s' AND DestinationPath = '%s'", hostname, backupName, destPath)
 	rows, err := db.Query(query)
 	if err != nil {
-		logger.Fatal("SQL", err)
+		Logging.NewInfoEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "MSSQL"})
 	}
 	return rows.Next()
 }
 
 func createMSSQLConnection(mssql MSSQLConnector) *sql.DB {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 
 	query := url.Values{}
 	query.Add("app name", "scabiosa")
@@ -76,7 +76,7 @@ func createMSSQLConnection(mssql MSSQLConnector) *sql.DB {
 
 	connector, err := mssqlpkg.NewConnector(sqlSettings.String())
 	if err != nil {
-		logger.Fatal("SQL", err)
+		Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "MSSQL"})
 	}
 
 	connector.SessionInitSQL = "SET ANSI_NULLS ON"
@@ -87,7 +87,7 @@ func createMSSQLConnection(mssql MSSQLConnector) *sql.DB {
 }
 
 func (mssql MSSQLConnector) createDefaultTables() {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 
 	eventLogSQL := "create table dbo.EventLog(" +
 		"UUID TEXT null, " +
@@ -116,14 +116,14 @@ func (mssql MSSQLConnector) createDefaultTables() {
 	if !mssql.checkIfBackupTableExist(db) {
 		_, err := db.Exec(backupSQL)
 		if err != nil {
-			logger.Fatal("SQL", err)
+			Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "MSSQL"})
 		}
 	}
 
 	if !mssql.checkIfEventLogTableExist(db) {
 		_, err := db.Exec(eventLogSQL)
 		if err != nil {
-			logger.Fatal("SQL", err)
+			Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "MSSQL"})
 		}
 	}
 
@@ -132,18 +132,18 @@ func (mssql MSSQLConnector) createDefaultTables() {
 
 // skipcq: RVV-A0005
 func (mssql MSSQLConnector) newLogEntry(logType Logging.LogType, backupName string, stage SQLStage, storageType RemoteStorageType, destination, description string, timestamp time.Time) {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 	db := createMSSQLConnection(mssql)
 
 	hostname, _ := os.Hostname()
 	query := fmt.Sprintf("INSERT INTO dbo.EventLog VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", uuid.New(), logType.String(), hostname, backupName, stage.String(), storageType.String(), destination, description, timestamp.Format("2006-01-02 15:04:05.999"))
 	_, err := db.Query(query)
 	if err != nil {
-		logger.Fatal("SQL", err)
+		Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "MSSQL"})
 	}
 }
 func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Time, storageType RemoteStorageType, sourcePath, destPath string, checksumType Tools.HashType, checksum string) {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 	db := createMSSQLConnection(mssql)
 
 	hostname, _ := os.Hostname()
@@ -152,13 +152,13 @@ func (mssql MSSQLConnector) newBackupEntry(backupName string, lastBackup time.Ti
 		queryUpdate := fmt.Sprintf("UPDATE dbo.Backups SET Lastbackup = '%s', Storage = '%s', SourcePath = '%s', ChecksumType = '%s', Checksum = '%s' WHERE Hostname = '%s' AND BackupName = '%s' AND DestinationPath = '%s'", lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, checksumType.String(), checksum, hostname, backupName, destPath)
 		_, err := db.Query(queryUpdate)
 		if err != nil {
-			logger.Fatal("SQL", err)
+			Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "MSSQL"})
 		}
 	} else {
 		queryInsert := fmt.Sprintf("INSERT INTO dbo.Backups VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", uuid.New(), hostname, backupName, lastBackup.Format("2006-01-02 15:04:05.999"), storageType.String(), sourcePath, destPath, checksumType.String(), checksum)
 		_, err := db.Query(queryInsert)
 		if err != nil {
-			logger.Fatal("SQL", err)
+			Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "MSSQL"})
 		}
 	}
 }
