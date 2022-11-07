@@ -12,7 +12,6 @@ import (
 	"scabiosa/Logging"
 	"scabiosa/SQL"
 	"scabiosa/Tools"
-	"strings"
 	"time"
 )
 
@@ -23,7 +22,7 @@ type AzureFileStorage struct {
 }
 
 func (azure AzureFileStorage) upload(fileName, backupName, destinationPath string) {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 
 	file, err := os.Open(fileName)
 	checkIfAzureError(backupName, destinationPath, err)
@@ -42,7 +41,7 @@ func (azure AzureFileStorage) upload(fileName, backupName, destinationPath strin
 
 	ctx := context.Background()
 
-	logger.Info(fmt.Sprintf("[%s] Starting upload to Azure File Share...\n", backupName))
+	Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "Staring upload to Azure File Share...", CurrBackup: backupName, CurrDest: destinationPath, CurrModule: "AzureFile"})
 	SQL.NewLogEntry(SQL.GetSQLInstance(), Logging.LogInfo, backupName, SQL.SqlStageUpload, SQL.RemoteAzureFile, destinationPath, "Starting upload.", time.Now())
 
 	progressBar := pb.StartNew(int(fileSize.Size()))
@@ -59,33 +58,33 @@ func (azure AzureFileStorage) upload(fileName, backupName, destinationPath strin
 
 	if err != nil {
 		SQL.NewLogEntry(SQL.GetSQLInstance(), Logging.LogFatal, backupName, SQL.SqlStageUpload, SQL.RemoteAzureFile, destinationPath, err.Error(), time.Now())
-		logger.Fatal(err)
+		Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrBackup: backupName, CurrDest: destinationPath, CurrModule: "AzureFile"})
 	}
 	progressBar.Finish()
-	logger.Info(fmt.Sprintf("[%s] Upload finished.\n", strings.Trim(backupName, ".bak")))
+	Logging.NewInfoEntry(logger, Logging.LogEntry{Message: "Upload finished.", CurrBackup: backupName, CurrDest: destinationPath, CurrModule: "AzureFile"})
 	SQL.NewLogEntry(SQL.GetSQLInstance(), Logging.LogInfo, backupName, SQL.SqlStageUpload, SQL.RemoteAzureFile, destinationPath, "Finished upload.", time.Now())
 }
 
 func readConfig() []byte {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 
 	file, err := os.ReadFile("config/azure.json")
 	if err != nil {
-		logger.Fatal(err)
+		Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "AzureFile"})
 	}
 
 	return file
 }
 
 func GetAzureStorage() AzureFileStorage {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 
 	var azureConfig Tools.AzureConfig
 	var azureFileShare AzureFileStorage
 
 	jsonErr := json.Unmarshal(readConfig(), &azureConfig)
 	if jsonErr != nil {
-		logger.Fatal(jsonErr)
+		Logging.NewFatalEntry(logger, Logging.LogEntry{Message: jsonErr.Error(), CurrModule: "AzureFile"})
 	}
 
 	azureFileShare.StorageAccountName = azureConfig.StorageAccountName
@@ -96,9 +95,9 @@ func GetAzureStorage() AzureFileStorage {
 }
 
 func checkIfAzureError(backupName, destinationPath string, err error) {
-	logger := Logging.BasicLog
+	logger := Logging.GetLoggingInstance()
 	if err != nil {
 		SQL.NewLogEntry(SQL.GetSQLInstance(), Logging.LogFatal, backupName, SQL.SqlStageUpload, SQL.RemoteAzureFile, destinationPath, err.Error(), time.Now())
-		logger.Fatal(err)
+		Logging.NewFatalEntry(logger, Logging.LogEntry{Message: err.Error(), CurrModule: "AzureFile"})
 	}
 }
