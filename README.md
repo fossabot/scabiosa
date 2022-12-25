@@ -86,7 +86,7 @@ YouTrack Issues & Agile Board: [Click me!](https://codenoodles.youtrack.cloud/is
 ### config.json (Linux)
 ```
 {
-  "useHashType: "SHA256",
+  "useHashType": "SHA256",
   "foldersToBackup": [
     {
       "backupName": "my-backup",
