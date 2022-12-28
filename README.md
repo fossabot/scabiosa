@@ -1,4 +1,6 @@
 # Scabiosa Backup Tool
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnetbenix%2Fscabiosa.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnetbenix%2Fscabiosa?ref=badge_shield)
+
 
 Please keep in mind that this project is WIP.
 
@@ -128,3 +130,7 @@ YouTrack Issues & Agile Board: [Click me!](https://codenoodles.youtrack.cloud/is
   ]
 }
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnetbenix%2Fscabiosa.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnetbenix%2Fscabiosa?ref=badge_large)
